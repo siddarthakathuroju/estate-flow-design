@@ -40,7 +40,7 @@ const Index = () => {
       
       {/* About Section */}
       <section 
-        ref={aboutRef as React.RefObject<HTMLDivElement>}
+        ref={aboutRef}
         className="py-16 md:py-24 bg-secondary/30"
       >
         <div className="container">
@@ -109,7 +109,7 @@ const Index = () => {
       
       {/* CTA Section */}
       <section 
-        ref={ctaRef as React.RefObject<HTMLDivElement>}
+        ref={ctaRef}
         className="py-16 md:py-24 bg-estate-500 text-white"
       >
         <div className="container">
