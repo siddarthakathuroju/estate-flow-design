@@ -1,6 +1,7 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bath, BedDouble, Square, Heart } from 'lucide-react';
+import { Bath, BedDouble, Square, Heart, Tag, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/animations';
 
@@ -78,6 +79,15 @@ const PropertyCard = ({
             Featured
           </div>
         )}
+        
+        {/* Marketplace Indicators */}
+        <div className="absolute top-12 left-3 bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm flex items-center">
+          <Tag size={12} className="mr-1" /> For Sale
+        </div>
+        
+        <div className="absolute top-[5.5rem] left-3 bg-green-500/90 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm flex items-center">
+          <Clock size={12} className="mr-1" /> New (2 days)
+        </div>
       </div>
       
       <div className="p-4">
@@ -86,7 +96,7 @@ const PropertyCard = ({
           <p className="text-muted-foreground text-sm mb-4">{address}</p>
         </Link>
         
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
           <div className="flex items-center">
             <BedDouble size={16} className="mr-1" />
             <span>{bedrooms} {bedrooms === 1 ? 'Bed' : 'Beds'}</span>
@@ -99,6 +109,20 @@ const PropertyCard = ({
             <Square size={16} className="mr-1" />
             <span>{area.toLocaleString()} ft²</span>
           </div>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex -space-x-2">
+            <div className="w-7 h-7 rounded-full bg-estate-200 border-2 border-white flex items-center justify-center text-xs text-estate-700">JD</div>
+            <div className="w-7 h-7 rounded-full bg-estate-300 border-2 border-white flex items-center justify-center text-xs text-white">AM</div>
+            <div className="w-7 h-7 rounded-full bg-estate-400 border-2 border-white flex items-center justify-center text-xs text-white">+3</div>
+          </div>
+          <Link 
+            to={`/properties/${id}`}
+            className="text-xs font-medium text-estate-500 hover:text-estate-600"
+          >
+            View Details →
+          </Link>
         </div>
       </div>
     </div>
