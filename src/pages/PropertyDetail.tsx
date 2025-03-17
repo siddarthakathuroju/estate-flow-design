@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ALL_PROPERTIES } from '@/lib/constants';
 import { formatPrice } from '@/lib/animations';
-import { ArrowLeft, MapPin, BedDouble, Bath, SquareFeet, ChevronRight, Heart, Share2 } from 'lucide-react';
+import { ArrowLeft, MapPin, BedDouble, Bath, Square, ChevronRight, Heart, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const PropertyDetail = () => {
@@ -130,7 +129,7 @@ const PropertyDetail = () => {
                   </div>
                 </div>
                 <div className="flex items-center">
-                  <SquareFeet size={20} className="mr-2 text-estate-500" />
+                  <Square size={20} className="mr-2 text-estate-500" />
                   <div>
                     <div className="font-medium">{property.area.toLocaleString()}</div>
                     <div className="text-xs text-muted-foreground">Square Feet</div>

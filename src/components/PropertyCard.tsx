@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bath, BedDouble, SquareFeet, Heart } from 'lucide-react';
+import { Bath, BedDouble, Square, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/animations';
 
@@ -103,7 +102,7 @@ const PropertyCard = ({
             <span>{bathrooms} {bathrooms === 1 ? 'Bath' : 'Baths'}</span>
           </div>
           <div className="flex items-center">
-            <SquareFeet size={16} className="mr-1" />
+            <Square size={16} className="mr-1" />
             <span>{area.toLocaleString()} ft²</span>
           </div>
         </div>
