@@ -41,7 +41,6 @@ const PropertyCard = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Container */}
       <div className="relative h-64 overflow-hidden">
         <Link to={`/properties/${id}`}>
           <img
@@ -54,7 +53,6 @@ const PropertyCard = ({
           />
         </Link>
         
-        {/* Favorite Button */}
         <button
           className={cn(
             'absolute top-3 right-3 p-2 rounded-full transition-all duration-300 z-10',
@@ -71,12 +69,10 @@ const PropertyCard = ({
           <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
         </button>
         
-        {/* Price Tag */}
         <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground shadow-sm">
           {formatPrice(price)}
         </div>
         
-        {/* Featured Tag */}
         {featured && (
           <div className="absolute top-3 left-3 bg-estate-500 px-3 py-1 rounded-full text-xs font-medium text-white shadow-sm">
             Featured
@@ -84,14 +80,12 @@ const PropertyCard = ({
         )}
       </div>
       
-      {/* Content */}
       <div className="p-4">
         <Link to={`/properties/${id}`} className="block">
           <h3 className="text-lg font-medium mb-1 transition-colors group-hover:text-estate-500">{title}</h3>
           <p className="text-muted-foreground text-sm mb-4">{address}</p>
         </Link>
         
-        {/* Details */}
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center">
             <BedDouble size={16} className="mr-1" />
