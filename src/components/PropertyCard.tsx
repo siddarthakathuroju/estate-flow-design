@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bath, BedDouble, Square, Heart, Tag, Clock } from 'lucide-react';
+import { Bath, BedDouble, Square, Heart, Tag, Clock, Wallet, Bitcoin, EthereumIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/animations';
 
@@ -32,6 +32,14 @@ const PropertyCard = ({
 }: PropertyCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+
+  // Randomly determine if the property uses ETH or BTC for demo purposes
+  const useEthereum = id % 2 === 0;
+  const cryptoSymbol = useEthereum ? 'ETH' : 'BTC';
+  const cryptoPrice = useEthereum ? (price / 3000).toFixed(2) : (price / 40000).toFixed(4);
+  
+  // Generate random token ID for NFT properties
+  const tokenId = `#${Math.floor(10000 + Math.random() * 90000)}`;
 
   return (
     <div 
@@ -70,8 +78,14 @@ const PropertyCard = ({
           <Heart size={18} fill={isFavorite ? 'currentColor' : 'none'} />
         </button>
         
-        <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground shadow-sm">
-          {formatPrice(price)}
+        <div className="absolute bottom-3 left-3 flex items-center space-x-2">
+          <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground shadow-sm flex items-center">
+            {useEthereum ? <EthereumIcon size={14} className="mr-1 text-purple-500" /> : <Bitcoin size={14} className="mr-1 text-orange-500" />}
+            <span>{cryptoPrice} {cryptoSymbol}</span>
+          </div>
+          <div className="bg-gray-900/90 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm">
+            {formatPrice(price)}
+          </div>
         </div>
         
         {featured && (
@@ -80,12 +94,17 @@ const PropertyCard = ({
           </div>
         )}
         
+        {/* NFT Token Badge */}
+        <div className="absolute top-12 left-3 bg-violet-600 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm flex items-center">
+          <Wallet size={12} className="mr-1" /> NFT {tokenId}
+        </div>
+        
         {/* Marketplace Indicators */}
-        <div className="absolute top-12 left-3 bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm flex items-center">
+        <div className="absolute top-[5.5rem] left-3 bg-amber-500 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm flex items-center">
           <Tag size={12} className="mr-1" /> For Sale
         </div>
         
-        <div className="absolute top-[5.5rem] left-3 bg-green-500/90 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm flex items-center">
+        <div className="absolute top-24 left-3 bg-green-500/90 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm flex items-center">
           <Clock size={12} className="mr-1" /> New (2 days)
         </div>
       </div>
@@ -93,7 +112,8 @@ const PropertyCard = ({
       <div className="p-4">
         <Link to={`/properties/${id}`} className="block">
           <h3 className="text-lg font-medium mb-1 transition-colors group-hover:text-estate-500">{title}</h3>
-          <p className="text-muted-foreground text-sm mb-4">{address}</p>
+          <p className="text-muted-foreground text-sm mb-2">{address}</p>
+          <p className="text-xs text-purple-600 font-semibold mb-4">Blockchain Verified • Smart Contract Enabled</p>
         </Link>
         
         <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
@@ -121,7 +141,7 @@ const PropertyCard = ({
             to={`/properties/${id}`}
             className="text-xs font-medium text-estate-500 hover:text-estate-600"
           >
-            View Details →
+            View NFT Details →
           </Link>
         </div>
       </div>
