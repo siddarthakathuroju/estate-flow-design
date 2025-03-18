@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Web3ReactProvider, useWeb3React } from '@web3-react/core';
+import { Web3ReactProvider, useWeb3React, initializeConnector } from '@web3-react/core';
 import { MetaMask } from '@web3-react/metamask';
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
 import { ethers } from 'ethers';
@@ -36,17 +36,29 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
-// Initialize MetaMask connector
-const metamask = new MetaMask();
+// Initialize connectors
+const [metaMaskConnector, metaMaskHooks] = initializeConnector(actions => 
+  new MetaMask({ actions })
+);
 
 // Initialize Coinbase Wallet connector
-const coinbaseWallet = new CoinbaseWallet({
-  url: 'https://mainnet.infura.io/v3/your-infura-id', // Will be replaced by user input
-  appName: 'NFT Property Exchange',
-});
+const [coinbaseConnector, coinbaseHooks] = initializeConnector(actions => 
+  new CoinbaseWallet({
+    actions,
+    options: {
+      appName: 'NFT Property Exchange',
+      jsonRpcUrl: 'https://mainnet.infura.io/v3/your-infura-id', // Will be replaced by user input
+    }
+  })
+);
+
+const connectors = [
+  [metaMaskConnector, metaMaskHooks],
+  [coinbaseConnector, coinbaseHooks]
+];
 
 // Wallet connection hook
 function useWalletConnection() {
@@ -58,10 +70,10 @@ function useWalletConnection() {
 
   // Connect to MetaMask
   const connectMetaMask = async () => {
-    if (connector !== metamask) {
+    if (connector !== metaMaskConnector) {
       try {
         setConnectionError(null);
-        await metamask.activate();
+        await metaMaskConnector.activate();
         toast({
           title: "Wallet Connected",
           description: "Successfully connected to MetaMask",
@@ -80,10 +92,10 @@ function useWalletConnection() {
 
   // Connect to Coinbase Wallet
   const connectCoinbaseWallet = async () => {
-    if (connector !== coinbaseWallet) {
+    if (connector !== coinbaseConnector) {
       try {
         setConnectionError(null);
-        await coinbaseWallet.activate();
+        await coinbaseConnector.activate();
         toast({
           title: "Wallet Connected",
           description: "Successfully connected to Coinbase Wallet",
@@ -135,8 +147,8 @@ function useWalletConnection() {
     const getBalance = async () => {
       if (isActive && account && provider) {
         try {
-          const ethProvider = new ethers.BrowserProvider(provider);
-          const balance = await ethProvider.getBalance(account);
+          // Using ethers v6 BrowserProvider instead of Web3Provider
+          const balance = await provider.getBalance(account);
           setBalance(ethers.formatEther(balance));
         } catch (error) {
           console.error("Error fetching balance:", error);
@@ -423,10 +435,10 @@ function DesktopWalletConnect() {
 
 // Main wallet connection component
 export default function WalletConnect() {
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   
   return (
-    <Web3ReactProvider connectors={[metamask, coinbaseWallet]}>
+    <Web3ReactProvider connectors={connectors}>
       {isMobile ? <MobileWalletConnect /> : <DesktopWalletConnect />}
     </Web3ReactProvider>
   );
@@ -434,10 +446,10 @@ export default function WalletConnect() {
 
 // Function for wallet connection that can be called anywhere in the app
 export function ConnectWalletButton({ className }: { className?: string }) {
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   
   return (
-    <Web3ReactProvider connectors={[metamask, coinbaseWallet]}>
+    <Web3ReactProvider connectors={connectors}>
       {isMobile ? <MobileWalletConnect /> : <DesktopWalletConnect />}
     </Web3ReactProvider>
   );
