@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ALL_PROPERTIES } from '@/lib/constants';
 import { formatPrice } from '@/lib/animations';
-import { ArrowLeft, MapPin, BedDouble, Bath, Square, ChevronRight, Heart, Share2, Wallet, Bitcoin, EthereumIcon, Blocks, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, BedDouble, Bath, Square, ChevronRight, Heart, Share2, Wallet, Bitcoin, CircleDollarSign, Blocks, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -103,7 +103,7 @@ const PropertyDetail = () => {
               <div className="flex items-center space-x-4 animate-fade-in delay-200">
                 <div className="flex flex-col items-end">
                   <div className="flex items-center text-xl font-medium">
-                    {useEthereum ? <EthereumIcon size={18} className="mr-1 text-purple-500" /> : <Bitcoin size={18} className="mr-1 text-orange-500" />}
+                    {useEthereum ? <CircleDollarSign size={18} className="mr-1 text-purple-500" /> : <Bitcoin size={18} className="mr-1 text-orange-500" />}
                     <span>{cryptoPrice} {cryptoSymbol}</span>
                   </div>
                   <div className="text-sm text-muted-foreground">
@@ -359,7 +359,7 @@ const PropertyDetail = () => {
                 
                 <div className="flex items-center justify-between bg-violet-50 p-3 rounded-lg mb-4">
                   <div className="flex items-center">
-                    {useEthereum ? <EthereumIcon size={16} className="mr-1 text-purple-500" /> : <Bitcoin size={16} className="mr-1 text-orange-500" />}
+                    {useEthereum ? <CircleDollarSign size={16} className="mr-1 text-purple-500" /> : <Bitcoin size={16} className="mr-1 text-orange-500" />}
                     <span className="text-violet-900 font-medium">{cryptoPrice} {cryptoSymbol}</span>
                   </div>
                   <span className="text-sm text-violet-700">{formatPrice(property.price)}</span>

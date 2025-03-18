@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bath, BedDouble, Square, Heart, Tag, Clock, Wallet, Bitcoin, EthereumIcon } from 'lucide-react';
+import { Bath, BedDouble, Square, Heart, Tag, Clock, Wallet, Bitcoin, CircleDollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/animations';
 
@@ -80,7 +80,7 @@ const PropertyCard = ({
         
         <div className="absolute bottom-3 left-3 flex items-center space-x-2">
           <div className="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-foreground shadow-sm flex items-center">
-            {useEthereum ? <EthereumIcon size={14} className="mr-1 text-purple-500" /> : <Bitcoin size={14} className="mr-1 text-orange-500" />}
+            {useEthereum ? <CircleDollarSign size={14} className="mr-1 text-purple-500" /> : <Bitcoin size={14} className="mr-1 text-orange-500" />}
             <span>{cryptoPrice} {cryptoSymbol}</span>
           </div>
           <div className="bg-gray-900/90 text-white px-3 py-1 rounded-full text-xs font-medium shadow-sm">
