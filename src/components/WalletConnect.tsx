@@ -50,7 +50,8 @@ const [coinbaseConnector, coinbaseHooks] = initializeConnector(actions =>
     actions,
     options: {
       appName: 'NFT Property Exchange',
-      jsonRpcUrl: 'https://mainnet.infura.io/v3/your-infura-id', // Will be replaced by user input
+      // Use the correct property name according to CoinbaseWallet's API
+      url: 'https://mainnet.infura.io/v3/your-infura-id', // Will be replaced by user input
     }
   })
 );

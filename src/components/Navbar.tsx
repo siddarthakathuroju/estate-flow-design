@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import WalletConnect from './WalletConnect';
+import UserMenu from './UserMenu';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -67,13 +69,15 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          <div className="ml-4">
+          <div className="ml-4 flex items-center gap-2">
             <WalletConnect />
+            <UserMenu />
           </div>
         </nav>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center md:hidden gap-4">
+          <UserMenu />
           <WalletConnect />
           <Button 
             variant="outline" 
