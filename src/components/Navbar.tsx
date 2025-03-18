@@ -1,88 +1,112 @@
 
 import { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useMobile } from '@/hooks/use-mobile';
 import { Menu, X } from 'lucide-react';
-import { NAV_LINKS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import WalletConnect from './WalletConnect';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const isMobile = useMobile();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when route changes
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location.pathname]);
+    setIsMenuOpen(false);
+  }, [location]);
+
+  const links = [
+    { path: '/', label: 'Home' },
+    { path: '/properties', label: 'Properties' },
+    { path: '/about', label: 'About' },
+    { path: '/contact', label: 'Contact' }
+  ];
 
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-sm',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled 
-          ? 'bg-white/80 shadow-sm py-3' 
+          ? 'bg-background/80 backdrop-blur-md border-b border-border/40 py-3'
           : 'bg-transparent py-5'
       )}
     >
-      <div className="container mx-auto flex items-center justify-between">
-        <NavLink 
-          to="/" 
-          className="text-2xl font-medium tracking-tight"
-        >
-          Estate<span className="text-estate-500">Flow</span>
-        </NavLink>
+      <div className="container flex items-center justify-between">
+        <Link to="/" className="flex items-center">
+          <span className="text-xl font-semibold text-estate-600">NFT</span>
+          <span className="text-xl font-semibold ml-1">Property</span>
+        </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          {NAV_LINKS.map((link) => (
-            <NavLink
-              key={link.id}
+        <nav className="hidden md:flex items-center space-x-1">
+          {links.map(link => (
+            <Link
+              key={link.path}
               to={link.path}
-              className={({ isActive }) => cn(
-                'text-sm font-medium transition-colors hover:text-estate-500',
-                isActive ? 'text-estate-500' : 'text-foreground'
+              className={cn(
+                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                location.pathname === link.path
+                  ? 'text-estate-600'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
               )}
             >
               {link.label}
-            </NavLink>
+            </Link>
           ))}
+          <div className="ml-4">
+            <WalletConnect />
+          </div>
         </nav>
 
         {/* Mobile Menu Button */}
-        <button
-          className="md:hidden text-foreground"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center md:hidden gap-4">
+          <WalletConnect />
+          <Button 
+            variant="outline" 
+            size="icon"
+            className={cn(
+              'h-9 w-9',
+              isScrolled ? 'border-border' : 'border-transparent'
+            )}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+          </Button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[60px] bg-background/95 backdrop-blur-sm animate-fade-in z-40">
-          <nav className="container flex flex-col items-center justify-center h-full space-y-8">
-            {NAV_LINKS.map((link, index) => (
-              <NavLink
-                key={link.id}
+      {/* Mobile Navigation */}
+      {isMenuOpen && (
+        <div className="md:hidden py-4 px-4 bg-background border-t border-border/40 animate-in slide-in-from-top">
+          <nav className="flex flex-col space-y-1">
+            {links.map(link => (
+              <Link
+                key={link.path}
                 to={link.path}
-                className={({ isActive }) => cn(
-                  'text-2xl font-medium transition-colors hover:text-estate-500 animate-fade-up',
-                  isActive ? 'text-estate-500' : 'text-foreground',
-                  `delay-${index * 100}`
+                className={cn(
+                  'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                  location.pathname === link.path
+                    ? 'bg-muted text-estate-600'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 )}
               >
                 {link.label}
-              </NavLink>
+              </Link>
             ))}
           </nav>
         </div>
