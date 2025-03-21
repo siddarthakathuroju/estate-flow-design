@@ -1,3 +1,4 @@
+
 import { toast } from "@/components/ui/use-toast";
 
 // Define the User type with proper structure
