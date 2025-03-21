@@ -45,13 +45,14 @@ const [metaMaskConnector, metaMaskHooks] = initializeConnector<MetaMask>((action
 );
 
 // Initialize Coinbase Wallet connector
+// Fixed: Use 'url' instead of 'jsonRpcUrl' for Coinbase Wallet connector
 const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWallet>((actions) => 
   new CoinbaseWallet({
     actions,
     options: {
       appName: 'NFT Property Exchange',
-      // Update to use jsonRpcUrl instead of rpc - this property is in the CoinbaseWalletSDKOptions
-      jsonRpcUrl: 'https://mainnet.infura.io/v3/your-infura-id'
+      // Updated to use 'url' which is the correct property for CoinbaseWalletSDKOptions
+      url: 'https://mainnet.infura.io/v3/your-infura-id'
     }
   })
 );
