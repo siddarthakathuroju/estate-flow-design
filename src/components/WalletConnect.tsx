@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Web3ReactProvider, useWeb3React, initializeConnector } from '@web3-react/core';
 import { MetaMask } from '@web3-react/metamask';
@@ -49,9 +50,8 @@ const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWallet>((
     actions,
     options: {
       appName: 'NFT Property Exchange',
-      rpc: {
-        1: 'https://mainnet.infura.io/v3/your-infura-id',
-      }
+      // Update to use jsonRpcUrl instead of rpc - this property is in the CoinbaseWalletSDKOptions
+      jsonRpcUrl: 'https://mainnet.infura.io/v3/your-infura-id'
     }
   })
 );
