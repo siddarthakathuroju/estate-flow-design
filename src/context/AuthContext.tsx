@@ -15,6 +15,8 @@ export interface User {
   email: string;
   name?: string;
   avatar?: string;
+  // Note: password is intentionally not included in this interface
+  // as it should never be exposed to components
 }
 
 // Define the AuthContext type

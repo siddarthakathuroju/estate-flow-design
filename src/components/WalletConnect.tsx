@@ -39,24 +39,25 @@ import { useToast } from '@/components/ui/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
-// Initialize connectors
-const [metaMaskConnector, metaMaskHooks] = initializeConnector(actions => 
+// Initialize connectors properly
+const [metaMaskConnector, metaMaskHooks] = initializeConnector<MetaMask>((actions) => 
   new MetaMask({ actions })
 );
 
 // Initialize Coinbase Wallet connector
-const [coinbaseConnector, coinbaseHooks] = initializeConnector(actions => 
+const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWallet>((actions) => 
   new CoinbaseWallet({
     actions,
     options: {
       appName: 'NFT Property Exchange',
-      // Use the correct property name according to CoinbaseWallet's API
-      url: 'https://mainnet.infura.io/v3/your-infura-id', // Will be replaced by user input
+      // Use jsonRpcUrl instead of url
+      jsonRpcUrl: 'https://mainnet.infura.io/v3/your-infura-id',
     }
   })
 );
 
-const connectors = [
+// Format connectors correctly for Web3ReactProvider
+const connectors: [MetaMask | CoinbaseWallet, typeof metaMaskHooks | typeof coinbaseHooks][] = [
   [metaMaskConnector, metaMaskHooks],
   [coinbaseConnector, coinbaseHooks]
 ];
@@ -148,8 +149,9 @@ function useWalletConnection() {
     const getBalance = async () => {
       if (isActive && account && provider) {
         try {
-          // Using ethers v6 BrowserProvider instead of Web3Provider
+          // Fix for ethers v6 - using formatted string directly
           const balance = await provider.getBalance(account);
+          // Convert BigNumber to string directly using ethers formatEther
           setBalance(ethers.formatEther(balance));
         } catch (error) {
           console.error("Error fetching balance:", error);

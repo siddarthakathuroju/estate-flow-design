@@ -1,11 +1,13 @@
 
 import { toast } from "@/components/ui/use-toast";
 
+// Define the User type with proper structure
 interface User {
   id: string;
   email: string;
   name?: string;
   avatar?: string;
+  password?: string; // Adding password as optional for internal use
 }
 
 // Mock user storage - in a real app, this would be handled by a backend
@@ -26,7 +28,9 @@ const saveUsers = (users: Record<string, User>) => {
 // Save current user to localStorage
 const saveCurrentUser = (user: User | null) => {
   if (user) {
-    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    // Remove password before saving to current user
+    const { password, ...userWithoutPassword } = user;
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userWithoutPassword));
   } else {
     localStorage.removeItem(CURRENT_USER_KEY);
   }
@@ -53,7 +57,7 @@ export const registerUser = (email: string, password: string, name?: string): Us
   }
   
   // Create new user
-  const newUser = {
+  const newUser: User = {
     id: crypto.randomUUID(),
     email,
     name: name || email.split('@')[0], // Use part of email as name if not provided
