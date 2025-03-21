@@ -1,11 +1,12 @@
 
-/* Remove problematic styles that affect responsive layout */
+/* Reset default styles that might affect responsive layout */
 #root {
   width: 100%;
   margin: 0 auto;
   text-align: center;
 }
 
+/* Keep logo styles but ensure they don't break responsive design */
 .logo {
   height: 6em;
   padding: 1.5em;
