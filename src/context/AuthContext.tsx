@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { 
   getCurrentUser, 
@@ -6,18 +5,9 @@ import {
   loginWithSocial, 
   registerUser, 
   logout, 
-  isLoggedIn
+  isLoggedIn,
+  User
 } from '@/services/authService';
-
-// Define the User type
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  avatar?: string;
-  // Note: password is intentionally not included in this interface
-  // as it should never be exposed to components
-}
 
 // Define the AuthContext type
 interface AuthContextType {

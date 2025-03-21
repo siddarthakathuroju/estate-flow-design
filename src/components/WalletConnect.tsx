@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Web3ReactProvider, useWeb3React, initializeConnector } from '@web3-react/core';
 import { MetaMask } from '@web3-react/metamask';
@@ -50,8 +49,9 @@ const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWallet>((
     actions,
     options: {
       appName: 'NFT Property Exchange',
-      // Use jsonRpcUrl instead of url
-      jsonRpcUrl: 'https://mainnet.infura.io/v3/your-infura-id',
+      rpc: {
+        1: 'https://mainnet.infura.io/v3/your-infura-id',
+      }
     }
   })
 );
@@ -151,8 +151,8 @@ function useWalletConnection() {
         try {
           // Fix for ethers v6 - using formatted string directly
           const balance = await provider.getBalance(account);
-          // Convert BigNumber to string directly using ethers formatEther
-          setBalance(ethers.formatEther(balance));
+          // Fixed: Convert balance to string before passing to formatEther
+          setBalance(ethers.formatEther(balance.toString()));
         } catch (error) {
           console.error("Error fetching balance:", error);
           setBalance(null);
@@ -441,7 +441,7 @@ export default function WalletConnect() {
   const isMobile = useIsMobile();
   
   return (
-    <Web3ReactProvider connectors={connectors}>
+    <Web3ReactProvider connectors={connectors as any}>
       {isMobile ? <MobileWalletConnect /> : <DesktopWalletConnect />}
     </Web3ReactProvider>
   );
@@ -452,7 +452,7 @@ export function ConnectWalletButton({ className }: { className?: string }) {
   const isMobile = useIsMobile();
   
   return (
-    <Web3ReactProvider connectors={connectors}>
+    <Web3ReactProvider connectors={connectors as any}>
       {isMobile ? <MobileWalletConnect /> : <DesktopWalletConnect />}
     </Web3ReactProvider>
   );

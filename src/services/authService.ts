@@ -1,8 +1,7 @@
-
 import { toast } from "@/components/ui/use-toast";
 
 // Define the User type with proper structure
-interface User {
+export interface User {
   id: string;
   email: string;
   name?: string;
@@ -132,4 +131,3 @@ export const logout = () => {
 export const isLoggedIn = (): boolean => {
   return getCurrentUser() !== null;
 };
-
