@@ -3,8 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import Index from './pages/Index';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
@@ -16,7 +14,8 @@ import NotFound from './pages/NotFound';
 import { Toaster } from './components/ui/toaster';
 import { AuthProvider } from './context/AuthContext';
 
-import './App.css';
+// Remove import of App.css as we've updated the styling
+// import './App.css';
 
 // Create a client
 const queryClient = new QueryClient();
@@ -28,20 +27,16 @@ function App() {
         <AuthProvider>
           <Router>
             <div className="flex flex-col min-h-screen">
-              <Navbar />
-              <main className="flex-grow">
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/properties" element={<Properties />} />
-                  <Route path="/properties/:id" element={<PropertyDetail />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/contact" element={<Contact />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </main>
-              <Footer />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/properties" element={<Properties />} />
+                <Route path="/properties/:id" element={<PropertyDetail />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
             </div>
           </Router>
           <Toaster />

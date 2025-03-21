@@ -28,6 +28,7 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    // Close mobile menu when route changes
     setIsMenuOpen(false);
   }, [location]);
 
@@ -41,13 +42,13 @@ const Navbar = () => {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full',
         isScrolled 
-          ? 'bg-background/80 backdrop-blur-md border-b border-border/40 py-3'
-          : 'bg-transparent py-5'
+          ? 'bg-background/90 backdrop-blur-md border-b border-border/40 py-2'
+          : 'bg-transparent py-4'
       )}
     >
-      <div className="container flex items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           <span className="text-xl font-semibold text-estate-600">NFT</span>
           <span className="text-xl font-semibold ml-1">Property</span>
@@ -60,7 +61,7 @@ const Navbar = () => {
               key={link.path}
               to={link.path}
               className={cn(
-                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                'px-3 py-2 rounded-md text-sm font-medium transition-colors',
                 location.pathname === link.path
                   ? 'text-estate-600'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -69,33 +70,33 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          <div className="ml-4 flex items-center gap-2">
+          <div className="ml-2 flex items-center gap-2">
             <WalletConnect />
             <UserMenu />
           </div>
         </nav>
 
         {/* Mobile Menu Button */}
-        <div className="flex items-center md:hidden gap-4">
+        <div className="flex items-center md:hidden gap-2">
           <UserMenu />
           <WalletConnect />
           <Button 
             variant="outline" 
             size="icon"
             className={cn(
-              'h-9 w-9',
+              'h-8 w-8',
               isScrolled ? 'border-border' : 'border-transparent'
             )}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            {isMenuOpen ? <X size={16} /> : <Menu size={16} />}
           </Button>
         </div>
       </div>
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden py-4 px-4 bg-background border-t border-border/40 animate-in slide-in-from-top">
+        <div className="md:hidden py-3 px-4 bg-background/95 backdrop-blur-sm border-t border-border/40 animate-in slide-in-from-top">
           <nav className="flex flex-col space-y-1">
             {links.map(link => (
               <Link
