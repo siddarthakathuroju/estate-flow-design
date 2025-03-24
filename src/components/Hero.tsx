@@ -25,9 +25,9 @@ const Hero = ({
         className
       )}
     >
-      {/* Background Image */}
+      {/* Background Image with parallax effect */}
       <div className="absolute inset-0 w-full h-full">
-        <div className="absolute inset-0 bg-black/30 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 z-10" />
         <img 
           src={backgroundImage} 
           alt="Hero background" 
@@ -39,27 +39,43 @@ const Hero = ({
         />
       </div>
       
+      {/* Overlay pattern */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0aDR2MWgtNHYtMXptMC0yfDJ2MWgtMnYtMXptLTIgMmgydjFoLTJ2LTF6bS0yLTJoMnYxaC0ydi0xem0xNi0xM2gydjFoLTJ2LTF6bS0yIDJoMnYxaC0ydi0xem0tMi0yaDF2MmgtMXYtMnptLTItMmgxdjJoLTF2LTJ6bS0yLTloMXYxaC0xdi0xem0tMiAyaDF2MWgtMXYtMXptLTIgMGgxdjFoLTF2LTF6bS0yLTJoMXYxaC0xdi0xem0tMiAwaDJ2MWgtMnYtMXptLTItMmgxdjJoLTF2LTJ6bS0yIDBoMXYyaC0xdi0yem0tMi0zaDF2MmgtMXYtMnptLTIgMGgxdjJoLTF2LTJ6bS0yIDBIMXYyaC0xdi0yek0xIDNoMXYySDF2LTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-40 z-[5]" />
+      
       {/* Content */}
-      <div className="container relative z-20 text-center text-white">
-        <h1 
-          className={cn(
-            'max-w-4xl mx-auto mb-4 transition-all duration-700',
-            isInView ? 'opacity-100 transform-none' : 'opacity-0 translate-y-8'
-          )}
-        >
-          {title}
-        </h1>
-        {subtitle && (
-          <p 
+      <div className="container relative z-20 text-center">
+        <div className="max-w-4xl mx-auto px-4">
+          <h1 
             className={cn(
-              'max-w-2xl mx-auto text-lg md:text-xl text-white/90 transition-all duration-700 delay-300',
+              'mb-4 text-gradient transition-all duration-700 font-bold drop-shadow-lg', 
               isInView ? 'opacity-100 transform-none' : 'opacity-0 translate-y-8'
             )}
           >
-            {subtitle}
-          </p>
-        )}
+            {title}
+          </h1>
+          {subtitle && (
+            <p 
+              className={cn(
+                'max-w-2xl mx-auto text-lg md:text-xl text-white drop-shadow-md transition-all duration-700 delay-300',
+                isInView ? 'opacity-100 transform-none' : 'opacity-0 translate-y-8'
+              )}
+            >
+              {subtitle}
+            </p>
+          )}
+          
+          {/* Decorative elements */}
+          <div 
+            className={cn(
+              "w-20 h-1 bg-gradient-to-r from-estate-400 to-estate-600 mx-auto mt-8 rounded-full transition-all duration-1000",
+              isInView ? "opacity-100 w-20" : "opacity-0 w-0"
+            )}
+          />
+        </div>
       </div>
+      
+      {/* Bottom gradient overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-10" />
     </section>
   );
 };

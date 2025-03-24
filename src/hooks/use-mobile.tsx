@@ -9,26 +9,39 @@ export function useIsMobile() {
   )
 
   React.useEffect(() => {
-    // Create handler function with debounce to improve performance
+    // Create handler function with debouncing for better performance
+    let timeoutId: number | null = null;
+    
     const handleResize = () => {
-      const mobileCheck = window.innerWidth < MOBILE_BREAKPOINT
-      if (mobileCheck !== isMobile) {
-        setIsMobile(mobileCheck)
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
-    }
+      
+      timeoutId = window.setTimeout(() => {
+        const mobileCheck = window.innerWidth < MOBILE_BREAKPOINT;
+        if (mobileCheck !== isMobile) {
+          setIsMobile(mobileCheck);
+        }
+      }, 100); // Small debounce for better performance
+    };
     
     // Add event listener
-    window.addEventListener('resize', handleResize)
+    window.addEventListener('resize', handleResize);
     
     // Handle initial check
-    handleResize()
+    handleResize();
     
     // Clean up
-    return () => window.removeEventListener('resize', handleResize)
-  }, [isMobile])
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isMobile]);
 
-  return isMobile
+  return isMobile;
 }
 
 // Alias for backward compatibility
-export const useMobile = useIsMobile
+export const useMobile = useIsMobile;

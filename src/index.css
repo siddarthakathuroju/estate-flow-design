@@ -171,6 +171,27 @@
   .responsive-card {
     @apply flex flex-col h-full rounded-lg overflow-hidden border border-border transition-all hover:shadow-md;
   }
+  
+  /* Special UI elements */
+  .glass {
+    @apply backdrop-blur-md bg-white/20 border border-white/30 shadow-xl;
+  }
+  
+  .glass-card {
+    @apply bg-white/90 backdrop-blur-sm border border-white/50 shadow-lg hover:shadow-xl transition-all duration-300;
+  }
+  
+  .special-gradient {
+    @apply bg-gradient-to-br from-estate-400/80 to-estate-600;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-estate-600 to-estate-800 bg-clip-text text-transparent;
+  }
+  
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
 }
 
 /* Responsive fixes */
@@ -199,4 +220,46 @@ html, body {
   .gap-responsive {
     @apply gap-4;
   }
+}
+
+/* Special effects */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.special-shadow {
+  box-shadow: 0 10px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shimmer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-25deg);
+  animation: shimmer 4s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
 }

@@ -6,7 +6,7 @@
   text-align: center;
 }
 
-/* Keep logo styles but ensure they don't break responsive design */
+/* Simplified logo styles that won't break responsive design */
 .logo {
   height: 6em;
   padding: 1.5em;
