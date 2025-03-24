@@ -1,15 +1,29 @@
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Gauge } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PropertyCard from './PropertyCard';
-import { FEATURED_PROPERTIES } from '@/lib/constants';
+import { ALL_PROPERTIES } from '@/lib/constants';
 import { useInView } from '@/lib/animations';
 import { cn } from '@/lib/utils';
+
+// Define the property types
+type PropertyType = 'all' | 'residential' | 'commercial' | 'new' | 'featured';
 
 const FeaturedProperties = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { ref, isInView } = useInView();
+  const [activeFilter, setActiveFilter] = useState<PropertyType>('all');
+
+  // Filter properties based on the active filter
+  const filteredProperties = ALL_PROPERTIES.filter(property => {
+    if (activeFilter === 'all') return property.featured;
+    if (activeFilter === 'residential') return property.type === 'residential' && property.featured;
+    if (activeFilter === 'commercial') return property.type === 'commercial' && property.featured;
+    if (activeFilter === 'new') return property.isNew === true && property.featured;
+    if (activeFilter === 'featured') return property.featured;
+    return property.featured;
+  });
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -22,6 +36,11 @@ const FeaturedProperties = () => {
         current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
       }
     }
+  };
+
+  // Handle filter change
+  const handleFilterChange = (filter: PropertyType) => {
+    setActiveFilter(filter);
   };
 
   return (
@@ -69,19 +88,59 @@ const FeaturedProperties = () => {
         
         {/* Category Filters */}
         <div className="flex flex-wrap gap-4 mb-8">
-          <button className="px-4 py-2 rounded-full bg-estate-500 text-white text-sm">
+          <button 
+            className={cn(
+              "px-4 py-2 rounded-full text-sm transition-colors",
+              activeFilter === 'all' 
+                ? "bg-estate-500 text-white" 
+                : "bg-white border border-border hover:bg-secondary/50"
+            )}
+            onClick={() => handleFilterChange('all')}
+          >
             All Properties
           </button>
-          <button className="px-4 py-2 rounded-full bg-white border border-border text-sm hover:bg-secondary/50">
+          <button 
+            className={cn(
+              "px-4 py-2 rounded-full text-sm transition-colors",
+              activeFilter === 'residential' 
+                ? "bg-estate-500 text-white" 
+                : "bg-white border border-border hover:bg-secondary/50"
+            )}
+            onClick={() => handleFilterChange('residential')}
+          >
             Residential
           </button>
-          <button className="px-4 py-2 rounded-full bg-white border border-border text-sm hover:bg-secondary/50">
+          <button 
+            className={cn(
+              "px-4 py-2 rounded-full text-sm transition-colors",
+              activeFilter === 'commercial' 
+                ? "bg-estate-500 text-white" 
+                : "bg-white border border-border hover:bg-secondary/50"
+            )}
+            onClick={() => handleFilterChange('commercial')}
+          >
             Commercial
           </button>
-          <button className="px-4 py-2 rounded-full bg-white border border-border text-sm hover:bg-secondary/50">
+          <button 
+            className={cn(
+              "px-4 py-2 rounded-full text-sm transition-colors",
+              activeFilter === 'new' 
+                ? "bg-estate-500 text-white" 
+                : "bg-white border border-border hover:bg-secondary/50"
+            )}
+            onClick={() => handleFilterChange('new')}
+          >
             New Listings
           </button>
-          <button className="px-4 py-2 rounded-full bg-white border border-border text-sm hover:bg-secondary/50">
+          <button 
+            className={cn(
+              "px-4 py-2 rounded-full text-sm transition-colors",
+              activeFilter === 'featured' 
+                ? "bg-estate-500 text-white" 
+                : "bg-white border border-border hover:bg-secondary/50"
+            )}
+            onClick={() => handleFilterChange('featured')}
+          >
             Featured
           </button>
         </div>
@@ -91,23 +150,29 @@ const FeaturedProperties = () => {
           className="flex overflow-x-auto pb-8 -mx-4 px-4 space-x-6 scrollbar-hide scroll-smooth"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {FEATURED_PROPERTIES.map((property, index) => (
-            <div 
-              key={property.id}
-              className={cn(
-                'min-w-[320px] md:min-w-[380px] transition-all duration-700',
-                isInView 
-                  ? 'opacity-100 transform-none' 
-                  : 'opacity-0 translate-y-8',
-                index === 0 ? '' : `delay-${index * 100}`
-              )}
-              style={{ 
-                transitionDelay: isInView ? `${index * 100}ms` : '0ms',
-              }}
-            >
-              <PropertyCard {...property} />
+          {filteredProperties.length > 0 ? (
+            filteredProperties.map((property, index) => (
+              <div 
+                key={property.id}
+                className={cn(
+                  'min-w-[320px] md:min-w-[380px] transition-all duration-700',
+                  isInView 
+                    ? 'opacity-100 transform-none' 
+                    : 'opacity-0 translate-y-8',
+                  index === 0 ? '' : `delay-${index * 100}`
+                )}
+                style={{ 
+                  transitionDelay: isInView ? `${index * 100}ms` : '0ms',
+                }}
+              >
+                <PropertyCard {...property} />
+              </div>
+            ))
+          ) : (
+            <div className="w-full text-center py-12">
+              <p className="text-muted-foreground">No properties found matching this filter.</p>
             </div>
-          ))}
+          )}
         </div>
         
         {/* Trending Indicators */}
