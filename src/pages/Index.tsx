@@ -14,6 +14,29 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useWalletConnection } from '@/hooks/use-wallet';
 import PropertyCard from '@/components/PropertyCard';
 
+// Add type information to FEATURED_PROPERTIES
+interface EnhancedProperty {
+  id: number;
+  title: string;
+  address: string;
+  price: number;
+  bedrooms: number;
+  bathrooms: number;
+  area: number;
+  description: string;
+  image: string;
+  featured: boolean;
+  type?: 'residential' | 'commercial' | 'land';
+  isNew?: boolean;
+}
+
+// Enhance the FEATURED_PROPERTIES with additional properties if they don't exist
+const enhancedProperties: EnhancedProperty[] = FEATURED_PROPERTIES.map(property => ({
+  ...property,
+  type: (property as any).type || 'residential', // Default to residential if not specified
+  isNew: (property as any).isNew || false // Default to false if not specified
+}));
+
 const Index = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const { ref: aboutRef, isInView: aboutIsInView } = useInView();
@@ -24,7 +47,7 @@ const Index = () => {
   const [propertyType, setPropertyType] = useState('all');
   
   // New state for filtered properties
-  const [displayedProperties, setDisplayedProperties] = useState(FEATURED_PROPERTIES);
+  const [displayedProperties, setDisplayedProperties] = useState<EnhancedProperty[]>(enhancedProperties);
   const [activeFilter, setActiveFilter] = useState('all');
   
   // Wallet state
@@ -44,26 +67,26 @@ const Index = () => {
     setActiveFilter(filter);
     
     if (filter === 'all') {
-      setDisplayedProperties(FEATURED_PROPERTIES);
+      setDisplayedProperties(enhancedProperties);
       return;
     }
     
     let filtered;
     switch(filter) {
       case 'residential':
-        filtered = FEATURED_PROPERTIES.filter(p => p.type === 'residential');
+        filtered = enhancedProperties.filter(p => p.type === 'residential');
         break;
       case 'commercial':
-        filtered = FEATURED_PROPERTIES.filter(p => p.type === 'commercial');
+        filtered = enhancedProperties.filter(p => p.type === 'commercial');
         break;
       case 'new':
-        filtered = FEATURED_PROPERTIES.filter(p => p.isNew);
+        filtered = enhancedProperties.filter(p => p.isNew);
         break;
       case 'featured':
-        filtered = FEATURED_PROPERTIES.filter(p => p.featured);
+        filtered = enhancedProperties.filter(p => p.featured);
         break;
       default:
-        filtered = FEATURED_PROPERTIES;
+        filtered = enhancedProperties;
     }
     
     setDisplayedProperties(filtered);
@@ -72,7 +95,7 @@ const Index = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, this would navigate to search results
-    const searchResults = FEATURED_PROPERTIES.filter(property => 
+    const searchResults = enhancedProperties.filter(property => 
       property.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
       property.address.toLowerCase().includes(searchQuery.toLowerCase())
     );
