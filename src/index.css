@@ -92,19 +92,19 @@
   }
 
   h1 {
-    @apply text-3xl sm:text-4xl lg:text-5xl;
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
   }
 
   h2 {
-    @apply text-2xl sm:text-3xl lg:text-4xl;
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl;
   }
 
   h3 {
-    @apply text-xl sm:text-2xl lg:text-3xl;
+    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl;
   }
 
   h4 {
-    @apply text-lg sm:text-xl lg:text-2xl;
+    @apply text-base sm:text-lg md:text-xl lg:text-2xl;
   }
 
   p {
@@ -114,7 +114,7 @@
 
 @layer components {
   .section {
-    @apply py-6 sm:py-10 md:py-16 lg:py-24;
+    @apply py-6 sm:py-8 md:py-12 lg:py-20;
   }
   
   .responsive-container {
@@ -174,7 +174,7 @@
   
   /* Special UI elements */
   .glass {
-    @apply backdrop-blur-md bg-white/20 border border-white/30 shadow-xl;
+    @apply backdrop-blur-lg bg-white/10 border border-white/20 shadow-xl;
   }
   
   .glass-card {
@@ -182,15 +182,24 @@
   }
   
   .special-gradient {
-    @apply bg-gradient-to-br from-estate-400/80 to-estate-600;
+    @apply bg-gradient-to-br from-estate-400/90 to-estate-600 backdrop-blur-sm;
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-estate-600 to-estate-800 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-estate-500 via-estate-600 to-estate-700 bg-clip-text text-transparent;
   }
   
   .hover-lift {
     @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+  
+  /* Glowing effects */
+  .glow {
+    box-shadow: 0 0 15px rgba(120, 148, 176, 0.7);
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 10px rgba(120, 148, 176, 0.7);
   }
 }
 
@@ -219,6 +228,15 @@ html, body {
   
   .gap-responsive {
     @apply gap-4;
+  }
+  
+  /* Mobile-specific adjustments */
+  .mobile-padding {
+    @apply px-4 py-6;
+  }
+  
+  .mobile-text-center {
+    @apply text-center;
   }
 }
 
@@ -262,4 +280,57 @@ html, body {
 @keyframes shimmer {
   0% { left: -100%; }
   100% { left: 200%; }
+}
+
+/* 3D card effect */
+.card-3d {
+  transition: transform 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.card-3d:hover {
+  transform: translateY(-5px) rotateX(5deg);
+}
+
+/* New animations */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-up {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  from { 
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Glassmorphism cards */
+.glass-morph {
+  @apply bg-white/5 backdrop-blur-lg border border-white/10 rounded-xl;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }

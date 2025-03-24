@@ -1,21 +1,25 @@
 
-/* Reset default styles that might affect responsive layout */
+/* Reset default styles and ensure responsive layout */
 #root {
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
   text-align: center;
+  overflow-x: hidden;
 }
 
-/* Simplified logo styles that won't break responsive design */
+/* Simplified logo styles with responsive sizing */
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  height: clamp(3em, 5vw, 6em);
+  padding: clamp(0.75em, 1.5vw, 1.5em);
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -36,9 +40,11 @@
 }
 
 .card {
-  padding: 2em;
+  padding: clamp(1em, 2vw, 2em);
+  width: 100%;
 }
 
 .read-the-docs {
   color: #888;
+  font-size: clamp(0.8rem, 1vw, 1rem);
 }

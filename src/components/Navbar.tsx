@@ -30,7 +30,18 @@ const Navbar = () => {
   useEffect(() => {
     // Close mobile menu when route changes
     setIsMenuOpen(false);
-  }, [location]);
+    
+    // Prevent body scroll when menu is open
+    if (isMenuOpen && isMobile) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [location, isMenuOpen, isMobile]);
 
   const links = [
     { path: '/', label: 'Home', icon: <Home size={16} /> },
@@ -44,7 +55,7 @@ const Navbar = () => {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full',
         isScrolled 
-          ? 'glass py-2'
+          ? 'backdrop-blur-md bg-white/10 border-b border-white/10 py-2 shadow-lg'
           : 'bg-transparent py-4'
       )}
     >
@@ -63,8 +74,8 @@ const Navbar = () => {
               className={cn(
                 'px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center',
                 location.pathname === link.path
-                  ? 'special-gradient text-white shadow-md'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  ? 'bg-gradient-to-r from-estate-400 to-estate-600 text-white shadow-md'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-white/10 backdrop-blur-sm'
               )}
             >
               <span className="mr-1.5">{link.icon}</span>
@@ -96,27 +107,30 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden py-3 px-4 glass animate-in slide-in-from-top">
-          <nav className="flex flex-col space-y-1">
-            {links.map(link => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={cn(
-                  'mobile-nav-item flex items-center',
-                  location.pathname === link.path
-                    ? 'special-gradient text-white'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-white/10'
-                )}
-              >
-                <span className="mr-2">{link.icon}</span>
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      )}
+      <div 
+        className={cn(
+          'md:hidden fixed inset-0 top-[57px] bg-black/80 backdrop-blur-md z-40 transition-transform duration-300 ease-in-out',
+          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        )}
+      >
+        <nav className="flex flex-col space-y-2 p-4 h-full">
+          {links.map(link => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={cn(
+                'mobile-nav-item flex items-center p-4 rounded-lg',
+                location.pathname === link.path
+                  ? 'bg-gradient-to-r from-estate-400/80 to-estate-600 text-white shadow-md'
+                  : 'text-white hover:bg-white/10'
+              )}
+            >
+              <span className="mr-3">{link.icon}</span>
+              <span className="text-lg">{link.label}</span>
+            </Link>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 };

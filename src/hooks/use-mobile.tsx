@@ -9,7 +9,7 @@ export function useIsMobile() {
   )
 
   React.useEffect(() => {
-    // Create handler function with debouncing for better performance
+    // Create handler function with improved debouncing
     let timeoutId: number | null = null;
     
     const handleResize = () => {
@@ -22,7 +22,7 @@ export function useIsMobile() {
         if (mobileCheck !== isMobile) {
           setIsMobile(mobileCheck);
         }
-      }, 100); // Small debounce for better performance
+      }, 150); // Slightly longer debounce for better performance
     };
     
     // Add event listener
