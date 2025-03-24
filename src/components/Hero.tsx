@@ -8,13 +8,15 @@ interface HeroProps {
   subtitle?: string;
   backgroundImage?: string;
   className?: string;
+  showExplanation?: boolean;
 }
 
 const Hero = ({ 
   title, 
   subtitle, 
   backgroundImage = 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-  className 
+  className,
+  showExplanation = false
 }: HeroProps) => {
   const { ref, isInView } = useInView();
   const isMobile = useIsMobile();
@@ -64,6 +66,35 @@ const Hero = ({
             >
               {subtitle}
             </p>
+          )}
+          
+          {showExplanation && (
+            <div className={cn(
+              "mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left transition-all duration-1000 delay-500",
+              isInView ? "opacity-100 transform-none" : "opacity-0 translate-y-8"
+            )}>
+              <div className="glass-morph p-4 backdrop-blur-md rounded-lg">
+                <h3 className="text-white text-lg font-medium mb-2">What is Real Estate Tokenization?</h3>
+                <p className="text-white/80 text-sm">
+                  Tokenization converts real estate assets into digital tokens on the blockchain, 
+                  enabling fractional ownership and simplified trading of property investments.
+                </p>
+              </div>
+              <div className="glass-morph p-4 backdrop-blur-md rounded-lg">
+                <h3 className="text-white text-lg font-medium mb-2">NFT Property Ownership</h3>
+                <p className="text-white/80 text-sm">
+                  NFTs (Non-Fungible Tokens) represent unique digital ownership rights to specific properties, 
+                  secured by blockchain technology for transparency and authenticity.
+                </p>
+              </div>
+              <div className="glass-morph p-4 backdrop-blur-md rounded-lg">
+                <h3 className="text-white text-lg font-medium mb-2">Benefits for Investors</h3>
+                <p className="text-white/80 text-sm">
+                  Simplified transactions, lower entry barriers, instant liquidity, and 
+                  global market access make tokenized real estate an innovative investment option.
+                </p>
+              </div>
+            </div>
           )}
           
           {/* Decorative elements */}
