@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AreaChart, Wallet, TrendingUp, TrendingDown, DollarSign, BarChart3, History } from 'lucide-react';
+import { AreaChart, Wallet, TrendingUp, TrendingDown, DollarSign, BarChart3, History, LineChart } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -26,13 +26,15 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
-import { calculatePortfolioSummary, getPropertyPerformance } from "@/services/portfolioService";
+import { calculatePortfolioSummary, getPropertyPerformance, getPortfolioChartData } from "@/services/portfolioService";
 import { getUserTransactionHistory } from "@/services/transactionService";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
+import { PortfolioChart } from "@/components/portfolio/PortfolioChart";
 
 export default function Portfolio() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("overview");
   
   // Redirect to auth page if not authenticated
   if (!isAuthenticated) {
@@ -43,6 +45,7 @@ export default function Portfolio() {
   // Get portfolio data
   const portfolioSummary = user ? calculatePortfolioSummary(user.id) : null;
   const propertyPerformance = user ? getPropertyPerformance(user.id) : [];
+  const portfolioChartData = user ? getPortfolioChartData(user.id) : [];
   
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -144,6 +147,15 @@ export default function Portfolio() {
             </div>
           </CardContent>
         </Card>
+      </div>
+      
+      {/* Portfolio value chart */}
+      <div className="mb-6">
+        <PortfolioChart 
+          data={portfolioChartData} 
+          title="Portfolio Value Over Time"
+          description="Track your portfolio's performance"
+        />
       </div>
       
       {/* Portfolio Tabs - Property Performance and Transaction History */}

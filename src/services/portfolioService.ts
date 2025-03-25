@@ -1,4 +1,3 @@
-
 import { Transaction, getTransactions } from "./transactionService";
 
 // Portfolio summary type
@@ -20,6 +19,12 @@ export interface PropertyWithProfit {
   currentValue: number;
   profit: number;
   profitPercentage: number;
+}
+
+// Portfolio chart data point
+export interface PortfolioChartData {
+  date: string;
+  value: number;
 }
 
 // Calculate portfolio summary from transactions
@@ -99,3 +104,55 @@ export const getPropertyPerformance = (userId: string): PropertyWithProfit[] => 
   return Array.from(propertyMap.values());
 };
 
+// Generate portfolio value chart data
+export const getPortfolioChartData = (userId: string): PortfolioChartData[] => {
+  const transactions = getTransactions(userId);
+  
+  if (transactions.length === 0) {
+    return [
+      { date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), value: 0 },
+      { date: new Date().toISOString(), value: 0 }
+    ];
+  }
+  
+  // Sort transactions by date
+  const sortedTransactions = [...transactions].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  
+  // Create a map to track portfolio value over time
+  const portfolioValueMap = new Map<string, number>();
+  let runningValue = 0;
+  
+  // Process each transaction to calculate cumulative portfolio value
+  sortedTransactions.forEach(transaction => {
+    if (transaction.type === 'buy') {
+      runningValue += transaction.amount;
+    } else if (transaction.type === 'sell') {
+      runningValue -= transaction.amount * 0.8; // Simulating that we sell at profit
+      runningValue += transaction.amount;
+    }
+    
+    // Store the portfolio value at this date
+    const dateKey = new Date(transaction.date).toISOString().split('T')[0];
+    portfolioValueMap.set(dateKey, runningValue);
+  });
+  
+  // Convert map to array of data points for the chart
+  const chartData: PortfolioChartData[] = Array.from(portfolioValueMap.entries())
+    .map(([date, value]) => ({
+      date: new Date(date).toISOString(),
+      value
+    }));
+  
+  // Ensure we have at least two data points for the chart
+  if (chartData.length === 1) {
+    // If only one data point, add another point for today
+    chartData.push({
+      date: new Date().toISOString(),
+      value: chartData[0].value
+    });
+  }
+  
+  return chartData;
+};
