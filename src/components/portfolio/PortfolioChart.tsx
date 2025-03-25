@@ -24,6 +24,14 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
     formattedDate: format(new Date(item.date), 'MMM dd')
   }));
 
+  // Function to safely format value as number with decimal places
+  const formatValue = (value: any): string => {
+    if (typeof value === 'number') {
+      return value.toFixed(4);
+    }
+    return String(value);
+  };
+
   return (
     <Card>
       <CardHeader className="pb-4">
@@ -74,18 +82,19 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                 <YAxis 
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `${value.toFixed(4)} ETH`}
+                  tickFormatter={(value) => `${formatValue(value)} ETH`}
                   domain={['auto', 'auto']}
                   padding={{ top: 10, bottom: 10 }}
                 />
                 <ChartTooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
+                      const value = payload[0].value;
                       return (
                         <div className="rounded-lg border bg-background p-2 shadow-sm">
                           <div className="font-medium">{payload[0].payload.formattedDate}</div>
                           <div className="text-xs text-muted-foreground">
-                            {payload[0].value.toFixed(4)} ETH
+                            {formatValue(value)} ETH
                           </div>
                         </div>
                       );
