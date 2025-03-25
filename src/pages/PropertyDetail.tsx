@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -11,6 +10,21 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
+function getPropertyImage(id: number): string {
+  const imagePool = [
+    "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600585154526-990dced4db0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600573472592-401b489a3cdc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+  ];
+  
+  return imagePool[id % imagePool.length];
+}
+
 const PropertyDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,7 +34,6 @@ const PropertyDetail = () => {
   
   const property = ALL_PROPERTIES.find(p => p.id === Number(id));
   
-  // NFT specific data for demonstration
   const propertyId = Number(id);
   const useEthereum = propertyId % 2 === 0;
   const cryptoSymbol = useEthereum ? 'ETH' : 'BTC';
@@ -31,7 +44,8 @@ const PropertyDetail = () => {
     ? `0x${Math.random().toString(16).slice(2, 42)}` 
     : `bc1${Math.random().toString(16).slice(2, 28)}`;
   
-  // Transaction history (simulated)
+  const propertyImage = property?.image || (property ? getPropertyImage(property.id) : "");
+  
   const transactions = [
     { date: '2023-12-15', action: 'Minted', from: '0x0000...', to: '0xAbC1...', price: useEthereum ? '1.2 ETH' : '0.09 BTC' },
     { date: '2024-01-03', action: 'Transfer', from: '0xAbC1...', to: '0xDeF2...', price: '-' },
@@ -39,7 +53,6 @@ const PropertyDetail = () => {
   ];
   
   useEffect(() => {
-    // Simulate content loading
     const timer = setTimeout(() => {
       setIsLoaded(true);
     }, 100);
@@ -76,7 +89,6 @@ const PropertyDetail = () => {
     )}>
       <Navbar />
       
-      {/* Property Header */}
       <section className="pt-24 pb-8">
         <div className="container">
           <div className="mb-6">
@@ -134,16 +146,14 @@ const PropertyDetail = () => {
             </div>
           </div>
           
-          {/* Property Image */}
           <div className="aspect-[16/9] rounded-lg overflow-hidden mb-8 animate-fade-in delay-100">
             <img 
-              src={property.image} 
+              src={propertyImage} 
               alt={property.title} 
               className="w-full h-full object-cover"
             />
           </div>
           
-          {/* Property Tabs */}
           <div className="border-b border-border mb-8">
             <div className="flex space-x-8">
               <button
@@ -182,7 +192,6 @@ const PropertyDetail = () => {
             </div>
           </div>
           
-          {/* Property Details */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 animate-fade-in delay-200">
               
@@ -226,7 +235,6 @@ const PropertyDetail = () => {
                     </div>
                   </div>
                   
-                  {/* Features */}
                   <div className="mb-8">
                     <h2 className="text-xl font-medium mb-4">Features</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -352,7 +360,6 @@ const PropertyDetail = () => {
               )}
             </div>
             
-            {/* Contact Card */}
             <div className="md:col-span-1 animate-fade-in delay-300">
               <div className="bg-white rounded-lg border border-border/60 shadow-sm p-6 sticky top-32">
                 <h3 className="text-lg font-medium mb-4">Purchase this NFT Property</h3>

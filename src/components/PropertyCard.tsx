@@ -40,6 +40,9 @@ const PropertyCard = ({
   
   // Generate random token ID for NFT properties
   const tokenId = `#${Math.floor(10000 + Math.random() * 90000)}`;
+  
+  // Generate a fallback image if the provided image URL is empty or undefined
+  const propertyImage = image || getPropertyImage(id);
 
   return (
     <div 
@@ -53,7 +56,7 @@ const PropertyCard = ({
       <div className="relative h-64 overflow-hidden">
         <Link to={`/properties/${id}`}>
           <img
-            src={image}
+            src={propertyImage}
             alt={title}
             className={cn(
               'w-full h-full object-cover transition-all duration-500',
@@ -148,5 +151,22 @@ const PropertyCard = ({
     </div>
   );
 };
+
+// Function to generate a property image based on the property ID
+function getPropertyImage(id: number): string {
+  const imagePool = [
+    "https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600585154526-990dced4db0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600607688969-a5bfcd646154?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600573472592-401b489a3cdc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+  ];
+  
+  // Use modulo to cycle through the image pool
+  return imagePool[id % imagePool.length];
+}
 
 export default PropertyCard;
