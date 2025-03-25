@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Menu, X, Home, Building2, Info, Phone } from 'lucide-react';
+import { Menu, X, Home, Building2, Info, Phone, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import WalletConnect from './WalletConnect';
 import UserMenu from './UserMenu';
@@ -46,6 +46,7 @@ const Navbar = () => {
   const links = [
     { path: '/', label: 'Home', icon: <Home size={16} /> },
     { path: '/properties', label: 'Properties', icon: <Building2 size={16} /> },
+    { path: '/portfolio', label: 'Portfolio', icon: <BarChart3 size={16} /> },
     { path: '/about', label: 'About', icon: <Info size={16} /> },
     { path: '/contact', label: 'Contact', icon: <Phone size={16} /> }
   ];
