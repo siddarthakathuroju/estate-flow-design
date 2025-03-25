@@ -11,6 +11,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
+import Portfolio from './pages/Portfolio'; // Add import for Portfolio
 import NotFound from './pages/NotFound';
 import { Toaster } from './components/ui/toaster';
 import { AuthProvider } from './context/AuthContext';
@@ -35,6 +36,7 @@ function App() {
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/profile" element={<Profile />} />
+                  <Route path="/portfolio" element={<Portfolio />} /> {/* Add Portfolio route */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
