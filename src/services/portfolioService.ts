@@ -1,3 +1,4 @@
+
 import { Transaction, getTransactions } from "./transactionService";
 
 // Portfolio summary type
@@ -30,6 +31,18 @@ export interface PortfolioChartData {
 // Calculate portfolio summary from transactions
 export const calculatePortfolioSummary = (userId: string): PortfolioSummary => {
   const transactions = getTransactions(userId);
+  
+  // If no transactions yet, return default values
+  if (transactions.length === 0) {
+    return {
+      totalInvested: 0,
+      totalReturns: 0,
+      profit: 0,
+      profitPercentage: 0,
+      propertiesOwned: 0,
+      totalTransactions: 0
+    };
+  }
   
   // Calculate total invested (buy transactions)
   const buyTransactions = transactions.filter(t => t.type === 'buy');
@@ -68,6 +81,11 @@ export const calculatePortfolioSummary = (userId: string): PortfolioSummary => {
 export const getPropertyPerformance = (userId: string): PropertyWithProfit[] => {
   const transactions = getTransactions(userId);
   const propertyMap = new Map<string, PropertyWithProfit>();
+  
+  // If no transactions yet, return empty array
+  if (transactions.length === 0) {
+    return [];
+  }
   
   // Process all transactions to calculate property performance
   transactions.forEach(transaction => {
@@ -108,10 +126,15 @@ export const getPropertyPerformance = (userId: string): PropertyWithProfit[] => 
 export const getPortfolioChartData = (userId: string): PortfolioChartData[] => {
   const transactions = getTransactions(userId);
   
+  // If no transactions yet, return default data points for an empty chart
   if (transactions.length === 0) {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
     return [
-      { date: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), value: 0 },
-      { date: new Date().toISOString(), value: 0 }
+      { date: thirtyDaysAgo.toISOString(), value: 0 },
+      { date: today.toISOString(), value: 0 }
     ];
   }
   

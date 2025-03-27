@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AreaChart, Wallet, TrendingUp, TrendingDown, DollarSign, BarChart3, History, LineChart } from 'lucide-react';
 import {
@@ -30,16 +30,34 @@ import { calculatePortfolioSummary, getPropertyPerformance, getPortfolioChartDat
 import { getUserTransactionHistory } from "@/services/transactionService";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
 import { PortfolioChart } from "@/components/portfolio/PortfolioChart";
+import { useWalletConnection } from '@/hooks/use-wallet';
 
 export default function Portfolio() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
+  const { isActive, account, balance } = useWalletConnection();
   
-  // Redirect to auth page if not authenticated
+  // Use useEffect for navigation to prevent the React warning
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/auth');
+    }
+  }, [isAuthenticated, navigate]);
+  
+  // If not authenticated, return a loading state instead of null
+  // This prevents the blank white screen while the redirect happens
   if (!isAuthenticated) {
-    navigate('/auth');
-    return null;
+    return (
+      <div className="container py-8 max-w-6xl">
+        <div className="flex items-center justify-center h-[60vh]">
+          <div className="text-center">
+            <h2 className="text-2xl font-semibold mb-2">Loading Portfolio...</h2>
+            <p className="text-muted-foreground">Please sign in to view your portfolio</p>
+          </div>
+        </div>
+      </div>
+    );
   }
   
   // Get portfolio data
@@ -69,6 +87,27 @@ export default function Portfolio() {
           <h1 className="text-3xl font-bold">Portfolio Dashboard</h1>
           <p className="text-muted-foreground">Track your property investments and performance</p>
         </div>
+        
+        {/* Wallet Information Card */}
+        {isActive && account && (
+          <Card className="w-auto">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <Wallet className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">Connected Wallet</p>
+                <p className="text-xs text-muted-foreground">
+                  {account.substring(0, 6)}...{account.substring(account.length - 4)}
+                </p>
+              </div>
+              <div className="pl-2 border-l">
+                <p className="text-sm font-medium">Balance</p>
+                <p className="text-xs">{balance ? `${parseFloat(balance).toFixed(4)} ETH` : '...'}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
       
       {/* Portfolio Summary Cards */}
