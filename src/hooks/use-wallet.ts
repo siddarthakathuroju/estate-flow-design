@@ -10,6 +10,8 @@ export function useWalletConnection() {
   const [balance, setBalance] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [pendingWallet, setPendingWallet] = useState<'metamask' | 'coinbase' | null>(null);
   const { toast } = useToast();
 
   // Connect to MetaMask
@@ -17,7 +19,24 @@ export function useWalletConnection() {
     if (connector !== metaMaskConnector) {
       try {
         setConnectionError(null);
+        setIsConnecting(true);
+        setPendingWallet('metamask');
+        
+        // Check if MetaMask is installed
+        const ethereum = window.ethereum;
+        if (!ethereum || !ethereum.isMetaMask) {
+          setConnectionError("MetaMask is not installed. Please install MetaMask to continue.");
+          toast({
+            variant: "destructive",
+            title: "MetaMask Not Found",
+            description: "Please install MetaMask browser extension to connect.",
+          });
+          setIsConnecting(false);
+          return;
+        }
+        
         await metaMaskConnector.activate();
+        
         toast({
           title: "Wallet Connected",
           description: "Successfully connected to MetaMask",
@@ -30,6 +49,9 @@ export function useWalletConnection() {
           title: "Connection Failed",
           description: "Failed to connect to MetaMask. Please try again.",
         });
+      } finally {
+        setIsConnecting(false);
+        setPendingWallet(null);
       }
     }
   };
@@ -39,7 +61,11 @@ export function useWalletConnection() {
     if (connector !== coinbaseConnector) {
       try {
         setConnectionError(null);
+        setIsConnecting(true);
+        setPendingWallet('coinbase');
+        
         await coinbaseConnector.activate();
+        
         toast({
           title: "Wallet Connected",
           description: "Successfully connected to Coinbase Wallet",
@@ -52,6 +78,9 @@ export function useWalletConnection() {
           title: "Connection Failed",
           description: "Failed to connect to Coinbase Wallet. Please try again.",
         });
+      } finally {
+        setIsConnecting(false);
+        setPendingWallet(null);
       }
     }
   };
@@ -115,6 +144,8 @@ export function useWalletConnection() {
     connectCoinbaseWallet,
     disconnect,
     copyAddress,
-    connectionError
+    connectionError,
+    isConnecting,
+    pendingWallet
   };
 }
