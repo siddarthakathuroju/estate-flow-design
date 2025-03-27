@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -9,6 +10,10 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { useWalletConnection } from '@/hooks/use-wallet';
+import { useToast } from '@/components/ui/use-toast';
+import { addTransaction } from '@/services/transactionService';
+import WalletConnect from '@/components/WalletConnect';
 
 function getPropertyImage(id: number): string {
   const imagePool = [
@@ -31,6 +36,10 @@ const PropertyDetail = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
+  const [walletInput, setWalletInput] = useState('');
+  
+  const { isActive, account, balance, connectMetaMask } = useWalletConnection();
+  const { toast } = useToast();
   
   const property = ALL_PROPERTIES.find(p => p.id === Number(id));
   
@@ -61,6 +70,60 @@ const PropertyDetail = () => {
     
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (isActive && account) {
+      setWalletInput(account);
+    }
+  }, [isActive, account]);
+  
+  const handleBuyProperty = () => {
+    if (!isActive) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to complete this purchase",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!property) return;
+    
+    // Check if user has enough balance (simplified for demo)
+    const requiredAmount = useEthereum ? 
+      parseFloat(cryptoPrice) + 0.005 : 
+      parseFloat(cryptoPrice) + 0.0001;
+      
+    if (balance && parseFloat(balance) < requiredAmount) {
+      toast({
+        title: "Insufficient Balance",
+        description: `You need at least ${requiredAmount} ${cryptoSymbol} to complete this purchase`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Add transaction to transaction history
+    addTransaction({
+      userId: account,
+      propertyId: propertyId.toString(),
+      propertyName: property.title,
+      propertyImage: propertyImage,
+      type: 'buy',
+      amount: parseFloat(cryptoPrice),
+      status: 'completed'
+    });
+    
+    toast({
+      title: "Purchase Successful!",
+      description: `You have successfully purchased ${property.title}`,
+    });
+    
+    // Navigate to portfolio
+    setTimeout(() => {
+      navigate('/portfolio');
+    }, 2000);
+  };
   
   if (!property) {
     return (
@@ -372,51 +435,94 @@ const PropertyDetail = () => {
                   <span className="text-sm text-violet-700">{formatPrice(property.price)}</span>
                 </div>
                 
-                <form className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Wallet Address</label>
-                    <Input
-                      type="text"
-                      placeholder="0x..."
+                {!isActive ? (
+                  <div className="space-y-4">
+                    <p className="text-sm text-center text-muted-foreground mb-2">
+                      Connect your wallet to purchase this property
+                    </p>
+                    
+                    <Button
+                      onClick={connectMetaMask}
+                      className="w-full flex items-center justify-center gap-2 bg-estate-500 hover:bg-estate-600"
+                    >
+                      <Wallet size={16} />
+                      Connect MetaMask
+                    </Button>
+                    
+                    <div className="flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground">or use</span>
+                    </div>
+                    
+                    <div className="flex justify-center">
+                      <WalletConnect />
+                    </div>
+                  </div>
+                ) : (
+                  <form className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Your Wallet Address</label>
+                      <Input
+                        type="text"
+                        value={walletInput}
+                        onChange={(e) => setWalletInput(e.target.value)}
+                        placeholder="0x..."
+                        className="w-full font-mono text-xs"
+                        readOnly
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Network Fee</span>
+                        <span>{useEthereum ? '0.005 ETH' : '0.0001 BTC'}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm font-medium">
+                        <span>Total Amount</span>
+                        <span>
+                          {useEthereum ? 
+                            (parseFloat(cryptoPrice) + 0.005).toFixed(2) : 
+                            (parseFloat(cryptoPrice) + 0.0001).toFixed(4)
+                          } {cryptoSymbol}
+                        </span>
+                      </div>
+                      {balance && (
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Your Balance</span>
+                          <span className={
+                            parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001)) 
+                              ? "text-red-500" 
+                              : "text-green-500"
+                          }>
+                            {parseFloat(balance).toFixed(4)} ETH
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      className="w-full py-3 px-4 bg-estate-500 text-white font-medium rounded-lg hover:bg-estate-600 transition-colors"
+                      onClick={handleBuyProperty}
+                      disabled={balance && parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001))}
+                    >
+                      {balance && parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001)) 
+                        ? "Insufficient Balance" 
+                        : "Buy NFT Property"}
+                    </Button>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
                       className="w-full"
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Network Fee</span>
-                      <span>{useEthereum ? '0.005 ETH' : '0.0001 BTC'}</span>
+                    >
+                      Make an Offer
+                    </Button>
+                    
+                    <div className="text-xs text-center text-muted-foreground">
+                      By completing this purchase, you agree to our terms and receive full digital ownership rights to this NFT property.
                     </div>
-                    <div className="flex items-center justify-between text-sm font-medium">
-                      <span>Total Amount</span>
-                      <span>
-                        {useEthereum ? 
-                          (parseFloat(cryptoPrice) + 0.005).toFixed(2) : 
-                          (parseFloat(cryptoPrice) + 0.0001).toFixed(4)
-                        } {cryptoSymbol}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <Button
-                    type="button"
-                    className="w-full py-3 px-4 bg-estate-500 text-white font-medium rounded-lg hover:bg-estate-600 transition-colors"
-                  >
-                    Buy NFT Property
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Make an Offer
-                  </Button>
-                  
-                  <div className="text-xs text-center text-muted-foreground">
-                    By completing this purchase, you agree to our terms and receive full digital ownership rights to this NFT property.
-                  </div>
-                </form>
+                  </form>
+                )}
               </div>
             </div>
           </div>

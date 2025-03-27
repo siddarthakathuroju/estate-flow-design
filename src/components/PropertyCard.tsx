@@ -4,6 +4,10 @@ import { Link } from 'react-router-dom';
 import { Bath, BedDouble, Square, Heart, Tag, Clock, Wallet, Bitcoin, CircleDollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/animations';
+import { Button } from '@/components/ui/button';
+import { useWalletConnection } from '@/hooks/use-wallet';
+import { useToast } from '@/components/ui/use-toast';
+import { addTransaction } from '@/services/transactionService';
 
 interface PropertyCardProps {
   id: number;
@@ -32,6 +36,8 @@ const PropertyCard = ({
 }: PropertyCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const { isActive, account } = useWalletConnection();
+  const { toast } = useToast();
 
   // Randomly determine if the property uses ETH or BTC for demo purposes
   const useEthereum = id % 2 === 0;
@@ -43,6 +49,37 @@ const PropertyCard = ({
   
   // Generate a fallback image if the provided image URL is empty or undefined
   const propertyImage = image || getPropertyImage(id);
+
+  // Quick purchase function
+  const handleQuickPurchase = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isActive || !account) {
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to purchase this property",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Add transaction to history
+    addTransaction({
+      userId: account,
+      propertyId: id.toString(),
+      propertyName: title,
+      propertyImage: propertyImage,
+      type: 'buy',
+      amount: parseFloat(cryptoPrice),
+      status: 'completed'
+    });
+    
+    toast({
+      title: "Purchase Successful!",
+      description: `You have purchased ${title} for ${cryptoPrice} ${cryptoSymbol}`,
+    });
+  };
 
   return (
     <div 
@@ -110,6 +147,17 @@ const PropertyCard = ({
         <div className="absolute top-24 left-3 bg-green-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium shadow-md flex items-center">
           <Clock size={12} className="mr-1" /> New (2 days)
         </div>
+
+        {/* Quick Buy Button - Only shown when hovered */}
+        {isHovered && (
+          <Button
+            className="absolute bottom-3 right-3 bg-estate-500 hover:bg-estate-600 text-white shadow-md text-xs font-medium transition-all z-10"
+            size="sm"
+            onClick={handleQuickPurchase}
+          >
+            Quick Buy
+          </Button>
+        )}
       </div>
       
       <div className="p-5">

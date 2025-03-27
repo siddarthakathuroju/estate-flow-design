@@ -4,7 +4,7 @@ import { MobileWalletConnect } from '@/components/wallet/MobileWalletConnect';
 import { DesktopWalletConnect } from '@/components/wallet/DesktopWalletConnect';
 
 // Main wallet connection component
-export default function WalletConnect() {
+export default function WalletConnect({ className }: { className?: string }) {
   const isMobile = useIsMobile();
   
   return (
