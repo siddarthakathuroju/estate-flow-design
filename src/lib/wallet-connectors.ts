@@ -20,9 +20,9 @@ export const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWa
   })
 );
 
-// Create a constant reference to connectors array to avoid re-renders
-// This fixes the "referentially static" error with Web3ReactProvider
+// Create a mutable array of connectors for Web3ReactProvider
+// This fixes the TypeScript error with readonly arrays
 export const connectors = [
   [metaMaskConnector, metaMaskHooks],
   [coinbaseConnector, coinbaseHooks]
-] as const;
+];

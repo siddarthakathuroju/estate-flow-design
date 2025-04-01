@@ -32,6 +32,14 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
     return String(value);
   };
 
+  // Define chart config for the ChartContainer
+  const chartConfig = {
+    value: {
+      label: 'Portfolio Value',
+      color: isProfit ? '#10b981' : '#ef4444'
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="pb-4">
@@ -51,7 +59,7 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
       </CardHeader>
       <CardContent>
         <div className="h-[300px] w-full">
-          <ChartContainer>
+          <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={formattedData}
