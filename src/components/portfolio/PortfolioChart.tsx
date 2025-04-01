@@ -58,12 +58,12 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
+        <div className="h-[240px] w-full"> {/* Adjusted height from 300px to 240px */}
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={formattedData}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                margin={{ top: 5, right: 5, left: 5, bottom: 5 }} {/* Adjusted margins */}
               >
                 <defs>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
@@ -71,19 +71,21 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                     <stop offset="95%" stopColor={isProfit ? "#10b981" : "#ef4444"} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
                 <XAxis 
                   dataKey="formattedDate"
                   tickLine={false}
                   axisLine={false}
-                  padding={{ left: 10, right: 10 }}
+                  padding={{ left: 5, right: 5 }} {/* Reduced padding */}
+                  tick={{ fontSize: 12 }} {/* Smaller font size */}
                 />
                 <YAxis 
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `${formatValue(value)} ETH`}
+                  tickFormatter={(value) => `${formatValue(value)}`} {/* Simplified Y-axis labels */}
                   domain={['auto', 'auto']}
-                  padding={{ top: 10, bottom: 10 }}
+                  tick={{ fontSize: 11 }} {/* Smaller font size */}
+                  width={55} {/* Control YAxis width */}
                 />
                 <Tooltip
                   content={({ active, payload }) => {
@@ -107,6 +109,7 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                   stroke={isProfit ? "#10b981" : "#ef4444"} 
                   fillOpacity={1} 
                   fill="url(#colorProfit)" 
+                  strokeWidth={2} {/* Increased stroke width for better visibility */}
                 />
               </AreaChart>
             </ResponsiveContainer>
