@@ -44,11 +44,19 @@ export function useWalletConnection() {
         });
       } catch (error) {
         console.error("MetaMask connection error:", error);
-        setConnectionError("Failed to connect to MetaMask. Please ensure it's installed and unlocked.");
+        let errorMessage = "Failed to connect to MetaMask.";
+        
+        if (error instanceof Error) {
+          if (error.message.includes("user rejected")) {
+            errorMessage = "You rejected the connection request.";
+          }
+        }
+        
+        setConnectionError(errorMessage);
         toast({
           variant: "destructive",
           title: "Connection Failed",
-          description: "Failed to connect to MetaMask. Please try again.",
+          description: errorMessage,
         });
       } finally {
         setIsConnecting(false);
@@ -76,23 +84,20 @@ export function useWalletConnection() {
         console.error("Coinbase Wallet connection error:", error);
         
         // Check if error is due to user rejection
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        let errorMessage = "Failed to connect to Coinbase Wallet.";
         
-        if (errorMessage.includes("User denied")) {
-          setConnectionError("Connection rejected. Please approve the connection request in Coinbase Wallet.");
-          toast({
-            variant: "destructive",
-            title: "Connection Rejected",
-            description: "You declined the connection request in Coinbase Wallet.",
-          });
-        } else {
-          setConnectionError("Failed to connect to Coinbase Wallet. Please ensure it's installed or try again.");
-          toast({
-            variant: "destructive",
-            title: "Connection Failed",
-            description: "Failed to connect to Coinbase Wallet. Please try again.",
-          });
+        if (error instanceof Error) {
+          if (error.message.includes("User denied")) {
+            errorMessage = "You declined the connection request in Coinbase Wallet.";
+          }
         }
+        
+        setConnectionError(errorMessage);
+        toast({
+          variant: "destructive",
+          title: "Connection Failed",
+          description: errorMessage,
+        });
       } finally {
         setIsConnecting(false);
         setPendingWallet(null);
@@ -103,15 +108,17 @@ export function useWalletConnection() {
   // Disconnect wallet
   const disconnect = async () => {
     try {
-      if (connector && connector.deactivate) {
-        await connector.deactivate();
-      } else {
-        await connector.resetState();
+      if (connector) {
+        if (connector.deactivate) {
+          await connector.deactivate();
+        } else {
+          await connector.resetState();
+        }
+        toast({
+          title: "Wallet Disconnected",
+          description: "Your wallet has been disconnected",
+        });
       }
-      toast({
-        title: "Wallet Disconnected",
-        description: "Your wallet has been disconnected",
-      });
     } catch (error) {
       console.error("Error disconnecting:", error);
     }

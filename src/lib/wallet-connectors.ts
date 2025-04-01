@@ -16,14 +16,13 @@ export const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWa
       appName: 'NFT Property Exchange',
       // Use proper URL for Ethereum mainnet
       url: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // Public Infura ID
-      // For Coinbase Wallet connector, we need to use 'initializationOptions' for chain config
-      // or simply not specify any chain ID to default to Ethereum mainnet
     }
   })
 );
 
-// Format connectors for Web3ReactProvider
-export const connectors: [MetaMask | CoinbaseWallet, typeof metaMaskHooks | typeof coinbaseHooks][] = [
+// Create a constant reference to connectors array to avoid re-renders
+// This fixes the "referentially static" error with Web3ReactProvider
+export const connectors = [
   [metaMaskConnector, metaMaskHooks],
   [coinbaseConnector, coinbaseHooks]
-];
+] as const;

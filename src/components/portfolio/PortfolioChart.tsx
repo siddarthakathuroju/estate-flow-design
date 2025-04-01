@@ -1,7 +1,7 @@
 
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, TooltipProps } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 import { format } from 'date-fns';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
@@ -51,16 +51,7 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
       </CardHeader>
       <CardContent>
         <div className="h-[300px] w-full">
-          <ChartContainer 
-            config={{
-              profit: {
-                theme: {
-                  light: isProfit ? "#10b981" : "#ef4444",
-                  dark: isProfit ? "#10b981" : "#ef4444",
-                },
-              },
-            }}
-          >
+          <ChartContainer>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={formattedData}
@@ -86,7 +77,7 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                   domain={['auto', 'auto']}
                   padding={{ top: 10, bottom: 10 }}
                 />
-                <ChartTooltip
+                <Tooltip
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       const value = payload[0].value;
