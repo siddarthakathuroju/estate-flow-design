@@ -58,12 +58,13 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[240px] w-full"> {/* Adjusted height from 300px to 240px */}
+        {/* Adjusted height from 300px to 240px for better fit */}
+        <div className="h-[240px] w-full">
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={formattedData}
-                margin={{ top: 5, right: 5, left: 5, bottom: 5 }} {/* Adjusted margins */}
+                margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
               >
                 <defs>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
@@ -72,20 +73,22 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                {/* X-Axis with smaller font and reduced padding */}
                 <XAxis 
                   dataKey="formattedDate"
                   tickLine={false}
                   axisLine={false}
-                  padding={{ left: 5, right: 5 }} {/* Reduced padding */}
-                  tick={{ fontSize: 12 }} {/* Smaller font size */}
+                  padding={{ left: 5, right: 5 }}
+                  tick={{ fontSize: 12 }}
                 />
+                {/* Y-Axis with simplified labels and controlled width */}
                 <YAxis 
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `${formatValue(value)}`} {/* Simplified Y-axis labels */}
+                  tickFormatter={(value) => `${formatValue(value)}`}
                   domain={['auto', 'auto']}
-                  tick={{ fontSize: 11 }} {/* Smaller font size */}
-                  width={55} {/* Control YAxis width */}
+                  tick={{ fontSize: 11 }}
+                  width={55}
                 />
                 <Tooltip
                   content={({ active, payload }) => {
@@ -103,13 +106,14 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                     return null;
                   }}
                 />
+                {/* Area with increased stroke width for better visibility */}
                 <Area 
                   type="monotone" 
                   dataKey="value" 
                   stroke={isProfit ? "#10b981" : "#ef4444"} 
                   fillOpacity={1} 
                   fill="url(#colorProfit)" 
-                  strokeWidth={2} {/* Increased stroke width for better visibility */}
+                  strokeWidth={2}
                 />
               </AreaChart>
             </ResponsiveContainer>
