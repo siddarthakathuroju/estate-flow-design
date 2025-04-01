@@ -2,6 +2,8 @@
 import { MetaMask } from '@web3-react/metamask';
 import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
 import { initializeConnector } from '@web3-react/core';
+import type { Connector } from '@web3-react/types';
+import type { Web3ReactHooks } from '@web3-react/core';
 
 // Initialize MetaMask connector
 export const [metaMaskConnector, metaMaskHooks] = initializeConnector<MetaMask>((actions) => 
@@ -20,9 +22,9 @@ export const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWa
   })
 );
 
-// Create a mutable array of connectors for Web3ReactProvider
-// This fixes the TypeScript error with readonly arrays
-export const connectors = [
+// Create the connectors array in the correct format for Web3ReactProvider
+// Explicitly type the array to ensure it matches what Web3ReactProvider expects
+export const connectors: [Connector, Web3ReactHooks][] = [
   [metaMaskConnector, metaMaskHooks],
   [coinbaseConnector, coinbaseHooks]
 ];
