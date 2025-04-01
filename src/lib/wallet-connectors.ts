@@ -16,8 +16,8 @@ export const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWa
       appName: 'NFT Property Exchange',
       // Use proper URL for Ethereum mainnet
       url: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // Public Infura ID
-      // Enable testnet for development
-      supportedChainIds: [1, 3, 4, 5, 42]
+      // The supportedChainIds property is not valid, we need to use chainId instead
+      chainId: 1 // Mainnet by default
     }
   })
 );
