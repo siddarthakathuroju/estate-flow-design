@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bath, BedDouble, Square, Heart, Tag, Clock, Wallet, Bitcoin, CircleDollarSign } from 'lucide-react';
+import { Bath, BedDouble, Square, Heart, Tag, Clock, Wallet, Bitcoin, CircleDollarSign, ArrowLeftRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/animations';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,7 @@ const PropertyCard = ({
 }: PropertyCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [transactionType, setTransactionType] = useState<'buy' | 'sell'>('buy');
   const { isActive, account } = useWalletConnection();
   const { toast } = useToast();
 
@@ -50,8 +51,15 @@ const PropertyCard = ({
   // Generate a fallback image if the provided image URL is empty or undefined
   const propertyImage = image || getPropertyImage(id);
 
-  // Quick purchase function
-  const handleQuickPurchase = (e: React.MouseEvent) => {
+  // Toggle between buy and sell
+  const toggleTransactionType = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setTransactionType(transactionType === 'buy' ? 'sell' : 'buy');
+  };
+
+  // Quick purchase or sell function
+  const handleTransaction = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -70,14 +78,16 @@ const PropertyCard = ({
       propertyId: id.toString(),
       propertyName: title,
       propertyImage: propertyImage,
-      type: 'buy',
+      type: transactionType,
       amount: parseFloat(cryptoPrice),
       status: 'completed'
     });
     
     toast({
-      title: "Purchase Successful!",
-      description: `You have purchased ${title} for ${cryptoPrice} ${cryptoSymbol}`,
+      title: transactionType === 'buy' ? "Purchase Successful!" : "Sale Successful!",
+      description: transactionType === 'buy' 
+        ? `You have purchased ${title} for ${cryptoPrice} ${cryptoSymbol}`
+        : `You have sold ${title} for ${cryptoPrice} ${cryptoSymbol}`,
     });
   };
 
@@ -141,21 +151,38 @@ const PropertyCard = ({
         
         {/* Marketplace Indicators */}
         <div className="absolute top-[5.5rem] left-3 bg-amber-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium shadow-md flex items-center">
-          <Tag size={12} className="mr-1" /> For Sale
+          <Tag size={12} className="mr-1" /> For {transactionType === 'buy' ? 'Sale' : 'Purchase'}
         </div>
         
         <div className="absolute top-24 left-3 bg-green-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium shadow-md flex items-center">
           <Clock size={12} className="mr-1" /> New (2 days)
         </div>
 
-        {/* Quick Buy Button - Only shown when hovered */}
+        {/* Transaction Type Toggle - Shows up when hovered */}
         {isHovered && (
           <Button
-            className="absolute bottom-3 right-3 bg-estate-500 hover:bg-estate-600 text-white shadow-md text-xs font-medium transition-all z-10"
+            className="absolute bottom-12 right-3 bg-white hover:bg-gray-100 text-gray-800 text-xs font-medium transition-all shadow-md z-10"
             size="sm"
-            onClick={handleQuickPurchase}
+            onClick={toggleTransactionType}
           >
-            Quick Buy
+            <ArrowLeftRight size={14} className="mr-1" />
+            Switch to {transactionType === 'buy' ? 'Sell' : 'Buy'}
+          </Button>
+        )}
+
+        {/* Quick Buy/Sell Button - Only shown when hovered */}
+        {isHovered && (
+          <Button
+            className={cn(
+              "absolute bottom-3 right-3 text-white shadow-md text-xs font-medium transition-all z-10",
+              transactionType === 'buy' 
+                ? "bg-estate-500 hover:bg-estate-600" 
+                : "bg-orange-500 hover:bg-orange-600"
+            )}
+            size="sm"
+            onClick={handleTransaction}
+          >
+            Quick {transactionType === 'buy' ? 'Buy' : 'Sell'}
           </Button>
         )}
       </div>

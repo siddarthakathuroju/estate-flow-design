@@ -5,7 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ALL_PROPERTIES } from '@/lib/constants';
 import { formatPrice } from '@/lib/animations';
-import { ArrowLeft, MapPin, BedDouble, Bath, Square, ChevronRight, Heart, Share2, Wallet, Bitcoin, CircleDollarSign, Blocks, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, MapPin, BedDouble, Bath, Square, ChevronRight, Heart, Share2, Wallet, Bitcoin, CircleDollarSign, Blocks, ShieldCheck, ArrowLeftRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -37,6 +37,7 @@ const PropertyDetail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState('details');
   const [walletInput, setWalletInput] = useState('');
+  const [transactionType, setTransactionType] = useState<'buy' | 'sell'>('buy');
   
   const { isActive, account, balance, connectMetaMask } = useWalletConnection();
   const { toast } = useToast();
@@ -77,11 +78,17 @@ const PropertyDetail = () => {
     }
   }, [isActive, account]);
   
-  const handleBuyProperty = () => {
+  // Toggle transaction type
+  const toggleTransactionType = () => {
+    setTransactionType(transactionType === 'buy' ? 'sell' : 'buy');
+  };
+  
+  // Handle buy or sell transaction
+  const handleTransaction = () => {
     if (!isActive) {
       toast({
         title: "Wallet Not Connected",
-        description: "Please connect your wallet to complete this purchase",
+        description: "Please connect your wallet to complete this transaction",
         variant: "destructive"
       });
       return;
@@ -94,7 +101,7 @@ const PropertyDetail = () => {
       parseFloat(cryptoPrice) + 0.005 : 
       parseFloat(cryptoPrice) + 0.0001;
       
-    if (balance && parseFloat(balance) < requiredAmount) {
+    if (transactionType === 'buy' && balance && parseFloat(balance) < requiredAmount) {
       toast({
         title: "Insufficient Balance",
         description: `You need at least ${requiredAmount} ${cryptoSymbol} to complete this purchase`,
@@ -109,14 +116,16 @@ const PropertyDetail = () => {
       propertyId: propertyId.toString(),
       propertyName: property.title,
       propertyImage: propertyImage,
-      type: 'buy',
+      type: transactionType,
       amount: parseFloat(cryptoPrice),
       status: 'completed'
     });
     
     toast({
-      title: "Purchase Successful!",
-      description: `You have successfully purchased ${property.title}`,
+      title: transactionType === 'buy' ? "Purchase Successful!" : "Sale Successful!",
+      description: transactionType === 'buy' 
+        ? `You have successfully purchased ${property.title}` 
+        : `You have successfully sold ${property.title}`,
     });
     
     // Navigate to portfolio
@@ -425,20 +434,38 @@ const PropertyDetail = () => {
             
             <div className="md:col-span-1 animate-fade-in delay-300">
               <div className="bg-white rounded-lg border border-border/60 shadow-sm p-6 sticky top-32">
-                <h3 className="text-lg font-medium mb-4">Purchase this NFT Property</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium">{transactionType === 'buy' ? 'Purchase' : 'Sell'} this NFT Property</h3>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={toggleTransactionType}
+                    className="h-8 px-2"
+                  >
+                    <ArrowLeftRight size={14} className="mr-1" />
+                    Switch to {transactionType === 'buy' ? 'Sell' : 'Buy'}
+                  </Button>
+                </div>
                 
-                <div className="flex items-center justify-between bg-violet-50 p-3 rounded-lg mb-4">
+                <div className={cn(
+                  "flex items-center justify-between p-3 rounded-lg mb-4",
+                  transactionType === 'buy' ? "bg-violet-50" : "bg-orange-50"
+                )}>
                   <div className="flex items-center">
                     {useEthereum ? <CircleDollarSign size={16} className="mr-1 text-purple-500" /> : <Bitcoin size={16} className="mr-1 text-orange-500" />}
-                    <span className="text-violet-900 font-medium">{cryptoPrice} {cryptoSymbol}</span>
+                    <span className={transactionType === 'buy' ? "text-violet-900 font-medium" : "text-orange-900 font-medium"}>
+                      {cryptoPrice} {cryptoSymbol}
+                    </span>
                   </div>
-                  <span className="text-sm text-violet-700">{formatPrice(property.price)}</span>
+                  <span className={transactionType === 'buy' ? "text-sm text-violet-700" : "text-sm text-orange-700"}>
+                    {formatPrice(property.price)}
+                  </span>
                 </div>
                 
                 {!isActive ? (
                   <div className="space-y-4">
                     <p className="text-sm text-center text-muted-foreground mb-2">
-                      Connect your wallet to purchase this property
+                      Connect your wallet to {transactionType === 'buy' ? 'purchase' : 'sell'} this property
                     </p>
                     
                     <Button
@@ -472,54 +499,86 @@ const PropertyDetail = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-muted-foreground">Network Fee</span>
-                        <span>{useEthereum ? '0.005 ETH' : '0.0001 BTC'}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-sm font-medium">
-                        <span>Total Amount</span>
-                        <span>
-                          {useEthereum ? 
-                            (parseFloat(cryptoPrice) + 0.005).toFixed(2) : 
-                            (parseFloat(cryptoPrice) + 0.0001).toFixed(4)
-                          } {cryptoSymbol}
-                        </span>
-                      </div>
-                      {balance && (
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Your Balance</span>
-                          <span className={
-                            parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001)) 
-                              ? "text-red-500" 
-                              : "text-green-500"
-                          }>
-                            {parseFloat(balance).toFixed(4)} ETH
-                          </span>
-                        </div>
+                      {transactionType === 'buy' && (
+                        <>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Network Fee</span>
+                            <span>{useEthereum ? '0.005 ETH' : '0.0001 BTC'}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm font-medium">
+                            <span>Total Amount</span>
+                            <span>
+                              {useEthereum ? 
+                                (parseFloat(cryptoPrice) + 0.005).toFixed(2) : 
+                                (parseFloat(cryptoPrice) + 0.0001).toFixed(4)
+                              } {cryptoSymbol}
+                            </span>
+                          </div>
+                          {balance && (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Your Balance</span>
+                              <span className={
+                                parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001)) 
+                                  ? "text-red-500" 
+                                  : "text-green-500"
+                              }>
+                                {parseFloat(balance).toFixed(4)} ETH
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                      
+                      {transactionType === 'sell' && (
+                        <>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">You Will Receive</span>
+                            <span className="text-green-500 font-medium">
+                              {useEthereum ? 
+                                (parseFloat(cryptoPrice) - 0.001).toFixed(2) : 
+                                (parseFloat(cryptoPrice) - 0.00005).toFixed(4)
+                              } {cryptoSymbol}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Network Fee</span>
+                            <span>{useEthereum ? '0.001 ETH' : '0.00005 BTC'}</span>
+                          </div>
+                        </>
                       )}
                     </div>
                     
                     <Button
                       type="button"
-                      className="w-full py-3 px-4 bg-estate-500 text-white font-medium rounded-lg hover:bg-estate-600 transition-colors"
-                      onClick={handleBuyProperty}
-                      disabled={balance && parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001))}
+                      className={cn(
+                        "w-full py-3 px-4 text-white font-medium rounded-lg transition-colors",
+                        transactionType === 'buy'
+                          ? "bg-estate-500 hover:bg-estate-600"
+                          : "bg-orange-500 hover:bg-orange-600"
+                      )}
+                      onClick={handleTransaction}
+                      disabled={transactionType === 'buy' && balance && parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001))}
                     >
-                      {balance && parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001)) 
-                        ? "Insufficient Balance" 
-                        : "Buy NFT Property"}
+                      {transactionType === 'buy'
+                        ? (balance && parseFloat(balance) < (parseFloat(cryptoPrice) + (useEthereum ? 0.005 : 0.0001)) 
+                          ? "Insufficient Balance" 
+                          : "Buy NFT Property")
+                        : "Sell NFT Property"
+                      }
                     </Button>
                     
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                    >
-                      Make an Offer
-                    </Button>
+                    {transactionType === 'buy' && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Make an Offer
+                      </Button>
+                    )}
                     
                     <div className="text-xs text-center text-muted-foreground">
-                      By completing this purchase, you agree to our terms and receive full digital ownership rights to this NFT property.
+                      By completing this {transactionType === 'buy' ? 'purchase' : 'sale'}, you agree to our terms and {transactionType === 'buy' ? 'receive full digital ownership rights to' : 'transfer your ownership rights of'} this NFT property.
                     </div>
                   </form>
                 )}
