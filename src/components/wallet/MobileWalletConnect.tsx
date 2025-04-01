@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { Wallet, LogIn, LogOut, UserCheck, Copy, CheckCircle, AlertCircle, Coins, ArrowRight } from 'lucide-react';
+import { Wallet, LogIn, LogOut, UserCheck, Copy, CheckCircle, AlertCircle, Coins, ArrowRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -44,6 +43,11 @@ export function MobileWalletConnect() {
   const handleCoinbaseConnect = () => {
     setActiveTab("connecting");
     connectCoinbaseWallet();
+  };
+
+  // Function to open Coinbase Wallet app store page
+  const openCoinbaseWalletDownload = () => {
+    window.open("https://www.coinbase.com/wallet/downloads", "_blank");
   };
 
   return (
@@ -157,6 +161,17 @@ export function MobileWalletConnect() {
                   />
                   Coinbase Wallet
                 </Button>
+                
+                <div className="text-xs text-muted-foreground pt-2 mt-2 border-t">
+                  <p className="mb-1">Don't have a wallet?</p>
+                  <Button 
+                    variant="link" 
+                    className="h-auto p-0 text-xs flex items-center" 
+                    onClick={openCoinbaseWalletDownload}
+                  >
+                    Download Coinbase Wallet <ExternalLink size={10} className="ml-1" />
+                  </Button>
+                </div>
               </TabsContent>
               
               <TabsContent value="manual" className="space-y-4">

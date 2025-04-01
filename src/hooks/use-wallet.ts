@@ -32,6 +32,7 @@ export function useWalletConnection() {
             description: "Please install MetaMask browser extension to connect.",
           });
           setIsConnecting(false);
+          setPendingWallet(null);
           return;
         }
         
@@ -64,6 +65,7 @@ export function useWalletConnection() {
         setIsConnecting(true);
         setPendingWallet('coinbase');
         
+        // Activate Coinbase wallet connector
         await coinbaseConnector.activate();
         
         toast({
@@ -72,12 +74,25 @@ export function useWalletConnection() {
         });
       } catch (error) {
         console.error("Coinbase Wallet connection error:", error);
-        setConnectionError("Failed to connect to Coinbase Wallet. Please ensure it's installed.");
-        toast({
-          variant: "destructive",
-          title: "Connection Failed",
-          description: "Failed to connect to Coinbase Wallet. Please try again.",
-        });
+        
+        // Check if error is due to user rejection
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        
+        if (errorMessage.includes("User denied")) {
+          setConnectionError("Connection rejected. Please approve the connection request in Coinbase Wallet.");
+          toast({
+            variant: "destructive",
+            title: "Connection Rejected",
+            description: "You declined the connection request in Coinbase Wallet.",
+          });
+        } else {
+          setConnectionError("Failed to connect to Coinbase Wallet. Please ensure it's installed or try again.");
+          toast({
+            variant: "destructive",
+            title: "Connection Failed",
+            description: "Failed to connect to Coinbase Wallet. Please try again.",
+          });
+        }
       } finally {
         setIsConnecting(false);
         setPendingWallet(null);

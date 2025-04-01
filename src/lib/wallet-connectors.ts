@@ -8,14 +8,16 @@ export const [metaMaskConnector, metaMaskHooks] = initializeConnector<MetaMask>(
   new MetaMask({ actions })
 );
 
-// Initialize Coinbase Wallet connector
+// Initialize Coinbase Wallet connector with proper configuration
 export const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWallet>((actions) => 
   new CoinbaseWallet({
     actions,
     options: {
       appName: 'NFT Property Exchange',
-      // Use 'url' which is the correct property for CoinbaseWalletSDKOptions
-      url: 'https://mainnet.infura.io/v3/your-infura-id'
+      // Use proper URL for Ethereum mainnet
+      url: 'https://mainnet.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161', // Public Infura ID
+      // Enable testnet for development
+      supportedChainIds: [1, 3, 4, 5, 42]
     }
   })
 );
