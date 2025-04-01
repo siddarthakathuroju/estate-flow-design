@@ -46,7 +46,6 @@ export default function Portfolio() {
   }, [isAuthenticated, navigate]);
   
   // If not authenticated, return a loading state instead of null
-  // This prevents the blank white screen while the redirect happens
   if (!isAuthenticated) {
     return (
       <div className="container py-8 max-w-6xl">
@@ -81,16 +80,16 @@ export default function Portfolio() {
   };
   
   return (
-    <div className="container py-8 max-w-6xl">
-      <div className="flex items-center justify-between mb-6">
+    <div className="container py-6 max-w-6xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Portfolio Dashboard</h1>
-          <p className="text-muted-foreground">Track your property investments and performance</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">Portfolio Dashboard</h1>
+          <p className="text-muted-foreground mt-1">Track your property investments and performance</p>
         </div>
         
         {/* Wallet Information Card */}
         {isActive && account && (
-          <Card className="w-auto">
+          <Card className="w-full sm:w-auto shrink-0">
             <CardContent className="p-4 flex items-center gap-3">
               <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
                 <Wallet className="h-5 w-5 text-primary" />
@@ -111,46 +110,46 @@ export default function Portfolio() {
       </div>
       
       {/* Portfolio Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Invested</p>
-                <h2 className="text-2xl font-bold mt-1">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Invested</p>
+                <h2 className="text-lg sm:text-xl font-bold mt-1">
                   {portfolioSummary ? formatCurrency(portfolioSummary.totalInvested) : '0 ETH'}
                 </h2>
               </div>
-              <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Wallet className="h-6 w-6 text-primary" />
+              <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <Wallet className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Returns</p>
-                <h2 className="text-2xl font-bold mt-1">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Returns</p>
+                <h2 className="text-lg sm:text-xl font-bold mt-1">
                   {portfolioSummary ? formatCurrency(portfolioSummary.totalReturns) : '0 ETH'}
                 </h2>
               </div>
-              <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <DollarSign className="h-6 w-6 text-primary" />
+              <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Total Profit/Loss</p>
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Profit/Loss</p>
                 <div className="flex items-center mt-1">
-                  <h2 className="text-2xl font-bold">
+                  <h2 className="text-lg sm:text-xl font-bold">
                     {portfolioSummary ? formatCurrency(portfolioSummary.profit) : '0 ETH'}
                   </h2>
                   {portfolioSummary && portfolioSummary.profit !== 0 && (
@@ -160,11 +159,11 @@ export default function Portfolio() {
                   )}
                 </div>
               </div>
-              <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+              <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
                 {portfolioSummary && portfolioSummary.profit >= 0 ? (
-                  <TrendingUp className="h-6 w-6 text-green-500" />
+                  <TrendingUp className="h-5 w-5 text-green-500" />
                 ) : (
-                  <TrendingDown className="h-6 w-6 text-red-500" />
+                  <TrendingDown className="h-5 w-5 text-red-500" />
                 )}
               </div>
             </div>
@@ -172,16 +171,16 @@ export default function Portfolio() {
         </Card>
         
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Properties Owned</p>
-                <h2 className="text-2xl font-bold mt-1">
+                <p className="text-xs sm:text-sm font-medium text-muted-foreground">Properties Owned</p>
+                <h2 className="text-lg sm:text-xl font-bold mt-1">
                   {portfolioSummary ? portfolioSummary.propertiesOwned : 0}
                 </h2>
               </div>
-              <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <BarChart3 className="h-6 w-6 text-primary" />
+              <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <BarChart3 className="h-5 w-5 text-primary" />
               </div>
             </div>
           </CardContent>
@@ -199,7 +198,7 @@ export default function Portfolio() {
       
       {/* Portfolio Tabs - Property Performance and Transaction History */}
       <Tabs defaultValue="properties" className="w-full">
-        <TabsList className="mb-6 grid grid-cols-2 w-[400px]">
+        <TabsList className="mb-5 grid grid-cols-2 w-full max-w-md">
           <TabsTrigger value="properties" className="flex items-center gap-2">
             <AreaChart className="h-4 w-4" />
             <span>Property Performance</span>
@@ -212,8 +211,8 @@ export default function Portfolio() {
         
         <TabsContent value="properties" className="mt-0">
           <Card>
-            <CardHeader>
-              <CardTitle>Property Performance</CardTitle>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl">Property Performance</CardTitle>
               <CardDescription>Track the profit and loss for each property</CardDescription>
             </CardHeader>
             <CardContent>

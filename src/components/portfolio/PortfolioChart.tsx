@@ -42,29 +42,28 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
 
   return (
     <Card>
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>{title}</CardTitle>
+            <CardTitle className="text-xl">{title}</CardTitle>
             {description && <CardDescription>{description}</CardDescription>}
           </div>
-          <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+          <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center">
             {isProfit ? (
-              <TrendingUp className="h-5 w-5 text-green-500" />
+              <TrendingUp className="h-4 w-4 text-green-500" />
             ) : (
-              <TrendingDown className="h-5 w-5 text-red-500" />
+              <TrendingDown className="h-4 w-4 text-red-500" />
             )}
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        {/* Adjusted height from 300px to 240px for better fit */}
-        <div className="h-[240px] w-full">
+      <CardContent className="pt-0">
+        <div className="h-[220px] w-full">
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={formattedData}
-                margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+                margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
               >
                 <defs>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
@@ -73,22 +72,20 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                {/* X-Axis with smaller font and reduced padding */}
                 <XAxis 
                   dataKey="formattedDate"
                   tickLine={false}
                   axisLine={false}
                   padding={{ left: 5, right: 5 }}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 11 }}
                 />
-                {/* Y-Axis with simplified labels and controlled width */}
                 <YAxis 
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => `${formatValue(value)}`}
                   domain={['auto', 'auto']}
-                  tick={{ fontSize: 11 }}
-                  width={55}
+                  tick={{ fontSize: 10 }}
+                  width={50}
                 />
                 <Tooltip
                   content={({ active, payload }) => {
@@ -96,7 +93,7 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                       const value = payload[0].value;
                       return (
                         <div className="rounded-lg border bg-background p-2 shadow-sm">
-                          <div className="font-medium">{payload[0].payload.formattedDate}</div>
+                          <div className="font-medium text-sm">{payload[0].payload.formattedDate}</div>
                           <div className="text-xs text-muted-foreground">
                             {formatValue(value)} ETH
                           </div>
@@ -106,14 +103,13 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                     return null;
                   }}
                 />
-                {/* Area with increased stroke width for better visibility */}
                 <Area 
                   type="monotone" 
                   dataKey="value" 
                   stroke={isProfit ? "#10b981" : "#ef4444"} 
                   fillOpacity={1} 
                   fill="url(#colorProfit)" 
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                 />
               </AreaChart>
             </ResponsiveContainer>
