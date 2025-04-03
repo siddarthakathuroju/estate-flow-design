@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Search, Home, Building2, Clock, Award, Wallet, Info, Check } from 'lucide-react';
@@ -13,6 +12,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useWalletConnection } from '@/hooks/use-wallet';
 import PropertyCard from '@/components/PropertyCard';
+import { ERC_STANDARDS } from '@/lib/erc-standards';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 // Add type information to FEATURED_PROPERTIES
 interface EnhancedProperty {
@@ -43,6 +49,7 @@ const Index = () => {
   const { ref: ctaRef, isInView: ctaIsInView } = useInView();
   const { ref: searchRef, isInView: searchIsInView } = useInView();
   const { ref: benefitsRef, isInView: benefitsIsInView } = useInView();
+  const { ref: ercRef, isInView: ercIsInView } = useInView();
   const [searchQuery, setSearchQuery] = useState('');
   const [propertyType, setPropertyType] = useState('all');
   
@@ -180,6 +187,62 @@ const Index = () => {
               </div>
             </div>
           </form>
+        </div>
+      </section>
+      
+      {/* ERC Standards Section */}
+      <section 
+        ref={ercRef}
+        className="py-14 bg-white"
+      >
+        <div className="container mx-auto px-4">
+          <div className={cn(
+            "max-w-4xl mx-auto transition-all duration-700",
+            ercIsInView ? "opacity-100 transform-none" : "opacity-0 translate-y-8"
+          )}>
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-medium mb-4">Ethereum Token Standards (ERC)</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Learn about the different Ethereum token standards used in our platform
+              </p>
+            </div>
+            
+            <Card className="shadow-md border border-border/50">
+              <CardContent className="pt-6">
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="erc-standards">
+                    <AccordionTrigger className="flex items-center text-lg font-medium">
+                      <Info className="h-5 w-5 mr-2 text-estate-500" />
+                      Click to explore ERC Standards
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {ERC_STANDARDS.map((standard) => (
+                          <div key={standard.id} className="p-4 bg-slate-50 rounded-lg hover:shadow-md transition-shadow">
+                            <h3 className="font-semibold text-lg mb-1 text-estate-600">{standard.name}</h3>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">{standard.description}</p>
+                            <p className="text-sm text-muted-foreground mb-2">{standard.relevance}</p>
+                            <div className="mt-2">
+                              <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Use Cases</h4>
+                              <p className="text-sm">{standard.useCase}</p>
+                            </div>
+                            <div className="mt-2">
+                              <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Properties</h4>
+                              <ul className="text-sm list-disc pl-5">
+                                {standard.properties.map((property, index) => (
+                                  <li key={index}>{property}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
       
