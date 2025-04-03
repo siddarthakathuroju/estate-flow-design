@@ -41,11 +41,11 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
   };
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="shadow-md border border-border/50">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-xl">{title}</CardTitle>
+            <CardTitle className="text-lg md:text-xl">{title}</CardTitle>
             {description && <CardDescription>{description}</CardDescription>}
           </div>
           <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center">
@@ -57,13 +57,13 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
-        <div className="h-[220px] w-full">
+      <CardContent className="p-0 pl-0 pr-0">
+        <div className="h-[200px] w-full">
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={formattedData}
-                margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
+                margin={{ top: 5, right: 0, left: 0, bottom: 5 }}
               >
                 <defs>
                   <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
@@ -77,7 +77,7 @@ export function PortfolioChart({ data, title, description }: PortfolioChartProps
                   tickLine={false}
                   axisLine={false}
                   padding={{ left: 5, right: 5 }}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 10 }}
                 />
                 <YAxis 
                   tickLine={false}
