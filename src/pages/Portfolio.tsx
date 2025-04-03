@@ -85,213 +85,219 @@ export default function Portfolio() {
   };
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
       <Hero 
         title="Portfolio Dashboard" 
         subtitle="Track your property investments and performance" 
         backgroundImage="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-        className="h-[40vh] md:h-[45vh]"
+        className="h-[30vh] md:h-[35vh]"
       />
       
-      <div className="container py-8 max-w-6xl -mt-16 relative z-10">
-        {/* Wallet Information Card */}
-        {isActive && account && (
-          <Card className="w-full mb-6 shadow-md border border-border/50">
-            <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <Wallet className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium">Connected Wallet</p>
-                <p className="text-xs text-muted-foreground">
-                  {account.substring(0, 6)}...{account.substring(account.length - 4)}
-                </p>
-              </div>
-              <div className="pl-2 border-l">
-                <p className="text-sm font-medium">Balance</p>
-                <p className="text-xs">{balance ? `${parseFloat(balance).toFixed(4)} ETH` : '...'}</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-        
-        {/* Portfolio Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <Card className="shadow-md border border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">Total Invested</p>
-                  <h2 className="text-lg font-bold mt-1">
-                    {portfolioSummary ? formatCurrency(portfolioSummary.totalInvested) : '0 ETH'}
-                  </h2>
+      <div className="container mx-auto px-4 md:px-6 py-8 max-w-7xl -mt-20 relative z-10">
+        <div className="grid gap-6">
+          {/* Wallet Information Card */}
+          {isActive && account && (
+            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Wallet className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Connected Wallet</p>
+                      <p className="text-xs text-muted-foreground">
+                        {account.substring(0, 6)}...{account.substring(account.length - 4)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="pl-0 sm:pl-4 border-l-0 sm:border-l">
+                    <p className="text-sm font-medium">Balance</p>
+                    <p className="text-xs">{balance ? `${parseFloat(balance).toFixed(4)} ETH` : '...'}</p>
+                  </div>
                 </div>
-                <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Wallet className="h-4 w-4 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
           
-          <Card className="shadow-md border border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">Total Returns</p>
-                  <h2 className="text-lg font-bold mt-1">
-                    {portfolioSummary ? formatCurrency(portfolioSummary.totalReturns) : '0 ETH'}
-                  </h2>
-                </div>
-                <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center">
-                  <DollarSign className="h-4 w-4 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="shadow-md border border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">Total Profit/Loss</p>
-                  <div className="flex items-center mt-1">
-                    <h2 className="text-lg font-bold">
-                      {portfolioSummary ? formatCurrency(portfolioSummary.profit) : '0 ETH'}
+          {/* Portfolio Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Total Invested</p>
+                    <h2 className="text-2xl font-bold mt-1">
+                      {portfolioSummary ? formatCurrency(portfolioSummary.totalInvested) : '0 ETH'}
                     </h2>
-                    {portfolioSummary && portfolioSummary.profit !== 0 && (
-                      <Badge className={`ml-2 ${portfolioSummary.profit > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        {formatPercentage(portfolioSummary.profitPercentage)}
-                      </Badge>
+                  </div>
+                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Wallet className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Total Returns</p>
+                    <h2 className="text-2xl font-bold mt-1">
+                      {portfolioSummary ? formatCurrency(portfolioSummary.totalReturns) : '0 ETH'}
+                    </h2>
+                  </div>
+                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <DollarSign className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Total Profit/Loss</p>
+                    <div className="flex items-center mt-1">
+                      <h2 className="text-2xl font-bold">
+                        {portfolioSummary ? formatCurrency(portfolioSummary.profit) : '0 ETH'}
+                      </h2>
+                      {portfolioSummary && portfolioSummary.profit !== 0 && (
+                        <Badge className={`ml-2 ${portfolioSummary.profit > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {formatPercentage(portfolioSummary.profitPercentage)}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    {portfolioSummary && portfolioSummary.profit >= 0 ? (
+                      <TrendingUp className="h-6 w-6 text-green-500" />
+                    ) : (
+                      <TrendingDown className="h-6 w-6 text-red-500" />
                     )}
                   </div>
                 </div>
-                <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center">
-                  {portfolioSummary && portfolioSummary.profit >= 0 ? (
-                    <TrendingUp className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 text-red-500" />
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="shadow-md border border-border/50">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground">Properties Owned</p>
-                  <h2 className="text-lg font-bold mt-1">
-                    {portfolioSummary ? portfolioSummary.propertiesOwned : 0}
-                  </h2>
-                </div>
-                <div className="h-9 w-9 bg-primary/10 rounded-full flex items-center justify-center">
-                  <BarChart3 className="h-4 w-4 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        {/* Portfolio value chart */}
-        <div className="mb-6">
-          <PortfolioChart 
-            data={portfolioChartData} 
-            title="Portfolio Value Over Time"
-            description="Track your portfolio's performance"
-          />
-        </div>
-        
-        {/* Portfolio Tabs - Property Performance and Transaction History */}
-        <Tabs defaultValue="properties" className="w-full">
-          <TabsList className="mb-5 grid grid-cols-2 w-full max-w-md">
-            <TabsTrigger value="properties" className="flex items-center gap-2">
-              <AreaChart className="h-4 w-4" />
-              <span>Property Performance</span>
-            </TabsTrigger>
-            <TabsTrigger value="transactions" className="flex items-center gap-2">
-              <History className="h-4 w-4" />
-              <span>Transaction History</span>
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="properties" className="mt-0">
-            <Card className="shadow-md border border-border/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg md:text-xl">Property Performance</CardTitle>
-                <CardDescription>Track the profit and loss for each property</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {propertyPerformance.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <AreaChart className="mx-auto h-12 w-12 text-muted-foreground/50 mb-3" />
-                    <h3 className="text-lg font-medium">No properties found</h3>
-                    <p className="max-w-sm mx-auto mt-1">
-                      Start buying properties to see their performance in your portfolio.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="rounded-md border overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Property</TableHead>
-                          <TableHead>Invested</TableHead>
-                          <TableHead>Current Value</TableHead>
-                          <TableHead>Profit/Loss</TableHead>
-                          <TableHead>Performance</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {propertyPerformance.map((property) => (
-                          <TableRow key={property.id}>
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-3">
-                                {property.image ? (
-                                  <img 
-                                    src={property.image} 
-                                    alt={property.name}
-                                    className="w-10 h-10 rounded-md object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center">
-                                    <AreaChart className="h-5 w-5 text-muted-foreground" />
-                                  </div>
-                                )}
-                                <span className="truncate max-w-[140px]">{property.name}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>{formatCurrency(property.invested)}</TableCell>
-                            <TableCell>{formatCurrency(property.currentValue)}</TableCell>
-                            <TableCell>{formatCurrency(property.profit)}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                {property.profit >= 0 ? (
-                                  <TrendingUp className="h-4 w-4 text-green-500" />
-                                ) : (
-                                  <TrendingDown className="h-4 w-4 text-red-500" />
-                                )}
-                                <Badge className={property.profit >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                                  {formatPercentage(property.profitPercentage)}
-                                </Badge>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
               </CardContent>
             </Card>
-          </TabsContent>
+            
+            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">Properties Owned</p>
+                    <h2 className="text-2xl font-bold mt-1">
+                      {portfolioSummary ? portfolioSummary.propertiesOwned : 0}
+                    </h2>
+                  </div>
+                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6 text-primary" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           
-          <TabsContent value="transactions" className="mt-0">
-            <TransactionHistory />
-          </TabsContent>
-        </Tabs>
+          {/* Portfolio value chart */}
+          <div>
+            <PortfolioChart 
+              data={portfolioChartData} 
+              title="Portfolio Value Over Time"
+              description="Track your portfolio's performance"
+            />
+          </div>
+          
+          {/* Portfolio Tabs - Property Performance and Transaction History */}
+          <Tabs defaultValue="properties" className="w-full">
+            <TabsList className="mb-5 grid grid-cols-2 w-full max-w-md mx-auto">
+              <TabsTrigger value="properties" className="flex items-center gap-2">
+                <AreaChart className="h-4 w-4" />
+                <span>Property Performance</span>
+              </TabsTrigger>
+              <TabsTrigger value="transactions" className="flex items-center gap-2">
+                <History className="h-4 w-4" />
+                <span>Transaction History</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="properties" className="mt-0">
+              <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg md:text-xl">Property Performance</CardTitle>
+                  <CardDescription>Track the profit and loss for each property</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {propertyPerformance.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <AreaChart className="mx-auto h-12 w-12 text-muted-foreground/50 mb-4" />
+                      <h3 className="text-lg font-medium">No properties found</h3>
+                      <p className="max-w-sm mx-auto mt-2">
+                        Start buying properties to see their performance in your portfolio.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-md border overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Property</TableHead>
+                            <TableHead>Invested</TableHead>
+                            <TableHead>Current Value</TableHead>
+                            <TableHead>Profit/Loss</TableHead>
+                            <TableHead>Performance</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {propertyPerformance.map((property) => (
+                            <TableRow key={property.id}>
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-3">
+                                  {property.image ? (
+                                    <img 
+                                      src={property.image} 
+                                      alt={property.name}
+                                      className="w-12 h-12 rounded-md object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-12 h-12 rounded-md bg-secondary flex items-center justify-center">
+                                      <AreaChart className="h-5 w-5 text-muted-foreground" />
+                                    </div>
+                                  )}
+                                  <span className="truncate max-w-[140px]">{property.name}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell>{formatCurrency(property.invested)}</TableCell>
+                              <TableCell>{formatCurrency(property.currentValue)}</TableCell>
+                              <TableCell>{formatCurrency(property.profit)}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  {property.profit >= 0 ? (
+                                    <TrendingUp className="h-4 w-4 text-green-500" />
+                                  ) : (
+                                    <TrendingDown className="h-4 w-4 text-red-500" />
+                                  )}
+                                  <Badge className={property.profit >= 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                                    {formatPercentage(property.profitPercentage)}
+                                  </Badge>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="transactions" className="mt-0">
+              <TransactionHistory />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
       
       <div className="mt-auto">

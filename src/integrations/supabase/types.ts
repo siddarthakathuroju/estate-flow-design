@@ -9,7 +9,210 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string | null
+          wallet_address: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          name?: string | null
+          wallet_address?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string | null
+          wallet_address?: string | null
+        }
+        Relationships: []
+      }
+      properties: {
+        Row: {
+          address: string
+          area: number
+          bathrooms: number
+          bedrooms: number
+          created_at: string
+          crypto_price: number | null
+          crypto_symbol: string | null
+          description: string | null
+          id: string
+          owner_id: string | null
+          price: number
+          status: string | null
+          title: string
+          token_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          area: number
+          bathrooms: number
+          bedrooms: number
+          created_at?: string
+          crypto_price?: number | null
+          crypto_symbol?: string | null
+          description?: string | null
+          id?: string
+          owner_id?: string | null
+          price: number
+          status?: string | null
+          title: string
+          token_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          area?: number
+          bathrooms?: number
+          bedrooms?: number
+          created_at?: string
+          crypto_price?: number | null
+          crypto_symbol?: string | null
+          description?: string | null
+          id?: string
+          owner_id?: string | null
+          price?: number
+          status?: string | null
+          title?: string
+          token_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      property_documents: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          description: string | null
+          document_type: string
+          id: string
+          ipfs_hash: string
+          name: string
+          property_id: string
+          size: number | null
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          description?: string | null
+          document_type: string
+          id?: string
+          ipfs_hash: string
+          name: string
+          property_id: string
+          size?: number | null
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          description?: string | null
+          document_type?: string
+          id?: string
+          ipfs_hash?: string
+          name?: string
+          property_id?: string
+          size?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_documents_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_images: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          ipfs_hash: string | null
+          is_primary: boolean | null
+          property_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          ipfs_hash?: string | null
+          is_primary?: boolean | null
+          property_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          ipfs_hash?: string | null
+          is_primary?: boolean | null
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_images_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          crypto_symbol: string | null
+          date: string
+          id: string
+          property_id: string
+          status: string
+          transaction_hash: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          crypto_symbol?: string | null
+          date?: string
+          id?: string
+          property_id: string
+          status: string
+          transaction_hash?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          crypto_symbol?: string | null
+          date?: string
+          id?: string
+          property_id?: string
+          status?: string
+          transaction_hash?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
