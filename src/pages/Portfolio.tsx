@@ -27,11 +27,12 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/AuthContext";
 import { calculatePortfolioSummary, getPropertyPerformance, getPortfolioChartData } from "@/services/portfolioService";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
-import { PortfolioChart } from "@/components/portfolio/PortfolioChart";
 import { useWalletConnection } from '@/hooks/use-wallet';
 import Hero from '@/components/Hero';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { PortfolioSummary } from '@/components/portfolio/PortfolioSummary';
+import { ProfitLossDisplay } from '@/components/portfolio/ProfitLossDisplay';
 
 export default function Portfolio() {
   const { user, isAuthenticated } = useAuth();
@@ -67,7 +68,6 @@ export default function Portfolio() {
   // Get portfolio data
   const portfolioSummary = user ? calculatePortfolioSummary(user.id) : null;
   const propertyPerformance = user ? getPropertyPerformance(user.id) : [];
-  const portfolioChartData = user ? getPortfolioChartData(user.id) : [];
   
   // Format currency
   const formatCurrency = (amount: number) => {
@@ -99,7 +99,7 @@ export default function Portfolio() {
         <div className="grid gap-6">
           {/* Wallet Information Card */}
           {isActive && account && (
-            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur mb-6">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
                   <div className="flex items-center gap-3">
@@ -123,91 +123,27 @@ export default function Portfolio() {
           )}
           
           {/* Portfolio Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">Total Invested</p>
-                    <h2 className="text-2xl font-bold mt-1">
-                      {portfolioSummary ? formatCurrency(portfolioSummary.totalInvested) : '0 ETH'}
-                    </h2>
-                  </div>
-                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <Wallet className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">Total Returns</p>
-                    <h2 className="text-2xl font-bold mt-1">
-                      {portfolioSummary ? formatCurrency(portfolioSummary.totalReturns) : '0 ETH'}
-                    </h2>
-                  </div>
-                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <DollarSign className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">Total Profit/Loss</p>
-                    <div className="flex items-center mt-1">
-                      <h2 className="text-2xl font-bold">
-                        {portfolioSummary ? formatCurrency(portfolioSummary.profit) : '0 ETH'}
-                      </h2>
-                      {portfolioSummary && portfolioSummary.profit !== 0 && (
-                        <Badge className={`ml-2 ${portfolioSummary.profit > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {formatPercentage(portfolioSummary.profitPercentage)}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    {portfolioSummary && portfolioSummary.profit >= 0 ? (
-                      <TrendingUp className="h-6 w-6 text-green-500" />
-                    ) : (
-                      <TrendingDown className="h-6 w-6 text-red-500" />
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">Properties Owned</p>
-                    <h2 className="text-2xl font-bold mt-1">
-                      {portfolioSummary ? portfolioSummary.propertiesOwned : 0}
-                    </h2>
-                  </div>
-                  <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-                    <BarChart3 className="h-6 w-6 text-primary" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
-          {/* Portfolio value chart */}
-          <div>
-            <PortfolioChart 
-              data={portfolioChartData} 
-              title="Portfolio Value Over Time"
-              description="Track your portfolio's performance"
+          {portfolioSummary && (
+            <PortfolioSummary 
+              totalInvested={portfolioSummary.totalInvested}
+              totalReturns={portfolioSummary.totalReturns}
+              profit={portfolioSummary.profit}
+              profitPercentage={portfolioSummary.profitPercentage}
+              propertiesOwned={portfolioSummary.propertiesOwned}
+              formatCurrency={formatCurrency}
+              formatPercentage={formatPercentage}
             />
-          </div>
+          )}
+          
+          {/* Profit/Loss Display (Replacing Chart) */}
+          {portfolioSummary && (
+            <ProfitLossDisplay 
+              profit={portfolioSummary.profit}
+              profitPercentage={portfolioSummary.profitPercentage}
+              formatCurrency={formatCurrency}
+              formatPercentage={formatPercentage}
+            />
+          )}
           
           {/* Portfolio Tabs - Property Performance and Transaction History */}
           <Tabs defaultValue="properties" className="w-full">
