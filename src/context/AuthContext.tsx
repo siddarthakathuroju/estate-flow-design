@@ -10,7 +10,7 @@ import {
   User
 } from '@/services/authService';
 
-// Define the AuthContext type
+// Define the AuthContext type with KYC status
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -19,6 +19,8 @@ interface AuthContextType {
   register: (email: string, password: string, name?: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  kycStatus: 'not_started' | 'pending' | 'verified';
+  updateKycStatus: (status: 'not_started' | 'pending' | 'verified') => void;
 }
 
 // Create the context
@@ -28,11 +30,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [kycStatus, setKycStatus] = useState<'not_started' | 'pending' | 'verified'>('not_started');
 
   useEffect(() => {
     // Check if user is already logged in
     const currentUser = getCurrentUser();
     setUser(currentUser);
+    
+    // Check KYC status from localStorage
+    const savedKycStatus = localStorage.getItem('kyc_status');
+    if (savedKycStatus && ['not_started', 'pending', 'verified'].includes(savedKycStatus)) {
+      setKycStatus(savedKycStatus as 'not_started' | 'pending' | 'verified');
+    }
+    
     setLoading(false);
   }, []);
 
@@ -68,6 +78,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const updateKycStatus = (status: 'not_started' | 'pending' | 'verified') => {
+    setKycStatus(status);
+    localStorage.setItem('kyc_status', status);
+  };
+
   // Provide the context value
   const value = {
     user,
@@ -76,7 +91,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     socialLogin,
     register,
     logout: handleLogout,
-    isAuthenticated: isLoggedIn()
+    isAuthenticated: isLoggedIn(),
+    kycStatus,
+    updateKycStatus
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

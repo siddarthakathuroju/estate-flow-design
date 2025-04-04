@@ -12,7 +12,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { User, LogOut, Settings, LogIn, BarChart3 } from 'lucide-react';
+import { User, LogOut, Settings, LogIn, BarChart3, Shield } from 'lucide-react';
 
 export default function UserMenu() {
   const { user, logout, isAuthenticated } = useAuth();
@@ -70,6 +70,12 @@ export default function UserMenu() {
           <Link to="/portfolio" className="cursor-pointer">
             <BarChart3 className="mr-2 h-4 w-4" />
             <span>Portfolio</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/kyc" className="cursor-pointer">
+            <Shield className="mr-2 h-4 w-4" />
+            <span>KYC Verification</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

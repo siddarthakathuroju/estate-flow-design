@@ -13,6 +13,7 @@ import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import Portfolio from './pages/Portfolio';
 import NotFound from './pages/NotFound';
+import KycVerification from './pages/KycVerification';
 import { Toaster } from './components/ui/toaster';
 import { AuthProvider } from './context/AuthContext';
 import { connectors } from '@/lib/wallet-connectors';
@@ -37,6 +38,7 @@ function App() {
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/portfolio" element={<Portfolio />} />
+                  <Route path="/kyc" element={<KycVerification />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
