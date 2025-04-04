@@ -169,6 +169,21 @@ export type Database = {
           },
         ]
       }
+      tokenized_properties: {
+        Row: {
+          "id (UUID": string | null
+          "primary key)": string | null
+        }
+        Insert: {
+          "id (UUID"?: string | null
+          "primary key)"?: string | null
+        }
+        Update: {
+          "id (UUID"?: string | null
+          "primary key)"?: string | null
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
