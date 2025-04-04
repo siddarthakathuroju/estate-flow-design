@@ -12,10 +12,10 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { User, LogOut, Settings, LogIn, BarChart3, Shield } from 'lucide-react';
+import { User, LogOut, Settings, LogIn, BarChart3, Shield, Building, ClipboardList, Users } from 'lucide-react';
 
 export default function UserMenu() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, isManager, isWorker } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -57,6 +57,9 @@ export default function UserMenu() {
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
             <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+            {user?.role && (
+              <p className="text-xs font-medium text-estate-500 capitalize">{user.role}</p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -72,6 +75,44 @@ export default function UserMenu() {
             <span>Portfolio</span>
           </Link>
         </DropdownMenuItem>
+        
+        {/* Role-specific menu items */}
+        {(isManager || isWorker) && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs text-muted-foreground">
+              Workspace
+            </DropdownMenuLabel>
+            
+            {isManager && (
+              <DropdownMenuItem asChild>
+                <Link to="/properties/manage" className="cursor-pointer">
+                  <Building className="mr-2 h-4 w-4" />
+                  <span>Manage Properties</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+            
+            {(isManager || isWorker) && (
+              <DropdownMenuItem asChild>
+                <Link to="/tasks" className="cursor-pointer">
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  <span>Tasks</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+            
+            {isManager && (
+              <DropdownMenuItem asChild>
+                <Link to="/team" className="cursor-pointer">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Team</span>
+                </Link>
+              </DropdownMenuItem>
+            )}
+          </>
+        )}
+        
         <DropdownMenuItem asChild>
           <Link to="/kyc" className="cursor-pointer">
             <Shield className="mr-2 h-4 w-4" />

@@ -7,6 +7,7 @@ import { Web3ReactProvider } from '@web3-react/core';
 import Index from './pages/Index';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
+import PropertyManagement from './pages/PropertyManagement';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Auth from './pages/Auth';
@@ -33,6 +34,7 @@ function App() {
                   <Route path="/" element={<Index />} />
                   <Route path="/properties" element={<Properties />} />
                   <Route path="/properties/:id" element={<PropertyDetail />} />
+                  <Route path="/properties/manage" element={<PropertyManagement />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/auth" element={<Auth />} />

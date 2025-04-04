@@ -11,27 +11,39 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          address: string | null
           avatar_url: string | null
           created_at: string
           email: string | null
           id: string
           name: string | null
+          phone_text: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          verified: boolean | null
           wallet_address: string | null
         }
         Insert: {
+          address?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
           id: string
           name?: string | null
+          phone_text?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          verified?: boolean | null
           wallet_address?: string | null
         }
         Update: {
+          address?: string | null
           avatar_url?: string | null
           created_at?: string
           email?: string | null
           id?: string
           name?: string | null
+          phone_text?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          verified?: boolean | null
           wallet_address?: string | null
         }
         Relationships: []
@@ -236,7 +248,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "manager" | "worker" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
