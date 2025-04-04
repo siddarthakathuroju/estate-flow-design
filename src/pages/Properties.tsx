@@ -8,6 +8,9 @@ import { ALL_PROPERTIES } from '@/lib/constants';
 import { useInView } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { Search, Filter, X } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // Types
 interface FilterState {
@@ -28,6 +31,8 @@ const Properties = () => {
     bathrooms: '',
   });
   const { ref: propertiesRef, isInView: propertiesIsInView } = useInView();
+  const { toast } = useToast();
+  const [initialLoad, setInitialLoad] = useState(true);
 
   useEffect(() => {
     // Simulate content loading
@@ -40,10 +45,21 @@ const Properties = () => {
 
   // Filter properties based on search and filters
   const filteredProperties = ALL_PROPERTIES.filter((property) => {
-    // Search filter
+    // If it's initial load and no search has been performed, show all properties
+    if (initialLoad && searchTerm === '') {
+      return true;
+    }
+    
+    // Search filter - more comprehensive search
+    const searchLower = searchTerm.toLowerCase();
     const matchesSearch = 
-      property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      property.address.toLowerCase().includes(searchTerm.toLowerCase());
+      property.title.toLowerCase().includes(searchLower) ||
+      property.address.toLowerCase().includes(searchLower) ||
+      property.description?.toLowerCase().includes(searchLower) ||
+      property.type?.toLowerCase().includes(searchLower) ||
+      property.price.toString().includes(searchLower) ||
+      property.bedrooms.toString() === searchLower ||
+      property.bathrooms.toString() === searchLower;
     
     // Price filter
     const matchesMinPrice = filters.minPrice === '' || property.price >= filters.minPrice;
@@ -71,6 +87,28 @@ const Properties = () => {
       ...filters,
       [name]: value === '' ? '' : parseInt(value),
     });
+    
+    // Mark that a search has been performed
+    setInitialLoad(false);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Mark that a search has been performed
+    setInitialLoad(false);
+    
+    // Show toast notification for search
+    if (searchTerm) {
+      toast({
+        description: `Searching for "${searchTerm}"`,
+      });
+    }
+
+    // Scroll to results
+    const resultsSection = document.getElementById('search-results');
+    if (resultsSection) {
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const hasActiveFilters = 
@@ -96,23 +134,33 @@ const Properties = () => {
       {/* Filters Section */}
       <section className="py-8 border-b border-border/50 sticky top-16 bg-background/95 backdrop-blur-sm z-10">
         <div className="container">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Search */}
             <div className="relative w-full md:w-auto md:flex-1 max-w-lg">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                 <Search size={18} className="text-muted-foreground" />
               </div>
-              <input
+              <Input
                 type="text"
-                placeholder="Search by location or property name..."
+                placeholder="Search by location, property name, price, bedrooms..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-1 focus:ring-estate-500 focus:border-estate-500 transition-all"
               />
             </div>
             
+            {/* Search Button */}
+            <Button 
+              type="submit"
+              className="bg-estate-500 hover:bg-estate-600 text-white transition-colors w-full md:w-auto"
+            >
+              <Search size={18} className="mr-2" />
+              Search Now
+            </Button>
+            
             {/* Filter Toggle Button */}
             <button
+              type="button"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className={cn(
                 "flex items-center px-4 py-2 rounded-lg border border-border transition-colors",
@@ -127,7 +175,7 @@ const Properties = () => {
                 </span>
               )}
             </button>
-          </div>
+          </form>
           
           {/* Expanded Filter Panel */}
           {isFilterOpen && (
@@ -189,9 +237,23 @@ const Properties = () => {
                 </div>
               </div>
               
-              <div className="flex justify-end mt-4">
+              <div className="flex justify-between mt-4">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    handleSearch({ preventDefault: () => {} } as React.FormEvent);
+                  }}
+                  className="bg-estate-500 hover:bg-estate-600 text-white"
+                >
+                  Apply Filters
+                </Button>
+                
                 <button
-                  onClick={resetFilters}
+                  type="button"
+                  onClick={() => {
+                    resetFilters();
+                    setInitialLoad(false);
+                  }}
                   className="text-sm text-muted-foreground hover:text-foreground flex items-center"
                 >
                   <X size={14} className="mr-1" /> Clear Filters
@@ -204,6 +266,7 @@ const Properties = () => {
       
       {/* Properties Grid */}
       <section 
+        id="search-results"
         ref={propertiesRef as React.RefObject<HTMLDivElement>}
         className="py-12 md:py-16"
       >
@@ -213,6 +276,9 @@ const Properties = () => {
               <div className="mb-8">
                 <p className="text-muted-foreground">
                   Showing <span className="font-medium text-foreground">{filteredProperties.length}</span> properties
+                  {searchTerm && !initialLoad && (
+                    <span> for "<span className="font-medium text-estate-500">{searchTerm}</span>"</span>
+                  )}
                 </p>
               </div>
               
@@ -237,12 +303,16 @@ const Properties = () => {
             <div className="text-center py-16">
               <h3 className="text-xl font-medium mb-2">No properties found</h3>
               <p className="text-muted-foreground mb-6">Try adjusting your search criteria</p>
-              <button
-                onClick={resetFilters}
-                className="px-4 py-2 bg-estate-500 text-white rounded-lg hover:bg-estate-600 transition-colors"
+              <Button
+                onClick={() => {
+                  resetFilters();
+                  setSearchTerm('');
+                  setInitialLoad(true);
+                }}
+                className="bg-estate-500 text-white hover:bg-estate-600 transition-colors"
               >
-                Reset Filters
-              </button>
+                Reset Search
+              </Button>
             </div>
           )}
         </div>
