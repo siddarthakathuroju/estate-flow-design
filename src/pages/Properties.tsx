@@ -7,7 +7,7 @@ import Hero from '@/components/Hero';
 import { ALL_PROPERTIES } from '@/lib/constants';
 import { useInView } from '@/lib/animations';
 import { cn } from '@/lib/utils';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, Home, Building2, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ interface FilterState {
   maxPrice: number | '';
   bedrooms: number | '';
   bathrooms: number | '';
+  type: string;
 }
 
 const Properties = () => {
@@ -29,6 +30,7 @@ const Properties = () => {
     maxPrice: '',
     bedrooms: '',
     bathrooms: '',
+    type: '',
   });
   const { ref: propertiesRef, isInView: propertiesIsInView } = useInView();
   const { toast } = useToast();
@@ -69,7 +71,10 @@ const Properties = () => {
     const matchesBedrooms = filters.bedrooms === '' || property.bedrooms >= filters.bedrooms;
     const matchesBathrooms = filters.bathrooms === '' || property.bathrooms >= filters.bathrooms;
     
-    return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesBedrooms && matchesBathrooms;
+    // Property type filter
+    const matchesType = filters.type === '' || property.type === filters.type;
+    
+    return matchesSearch && matchesMinPrice && matchesMaxPrice && matchesBedrooms && matchesBathrooms && matchesType;
   });
 
   const resetFilters = () => {
@@ -78,6 +83,7 @@ const Properties = () => {
       maxPrice: '',
       bedrooms: '',
       bathrooms: '',
+      type: '',
     });
   };
 
@@ -85,11 +91,32 @@ const Properties = () => {
     const { name, value } = e.target;
     setFilters({
       ...filters,
-      [name]: value === '' ? '' : parseInt(value),
+      [name]: value === '' ? '' : name === 'type' ? value : parseInt(value),
     });
     
     // Mark that a search has been performed
     setInitialLoad(false);
+  };
+  
+  // New function to handle property type selection
+  const handleTypeFilter = (type: string) => {
+    setFilters({
+      ...filters,
+      type: filters.type === type ? '' : type
+    });
+    
+    // Mark that a search has been performed and trigger search
+    setInitialLoad(false);
+    
+    // Show toast notification for type filter
+    toast({
+      description: filters.type === type 
+        ? `Showing all property types` 
+        : `Filtering by ${type} properties`,
+    });
+    
+    // Scroll to results
+    scrollToResults();
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -105,6 +132,10 @@ const Properties = () => {
     }
 
     // Scroll to results
+    scrollToResults();
+  };
+  
+  const scrollToResults = () => {
     const resultsSection = document.getElementById('search-results');
     if (resultsSection) {
       resultsSection.scrollIntoView({ behavior: 'smooth' });
@@ -115,7 +146,8 @@ const Properties = () => {
     filters.minPrice !== '' || 
     filters.maxPrice !== '' || 
     filters.bedrooms !== '' || 
-    filters.bathrooms !== '';
+    filters.bathrooms !== '' || 
+    filters.type !== '';
 
   return (
     <div className={cn(
@@ -176,6 +208,37 @@ const Properties = () => {
               )}
             </button>
           </form>
+          
+          {/* Quick Property Type Filters */}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant={filters.type === 'residential' ? 'default' : 'outline'}
+              className={filters.type === 'residential' ? 'bg-estate-500 hover:bg-estate-600' : ''}
+              onClick={() => handleTypeFilter('residential')}
+            >
+              <Home size={16} className="mr-2" />
+              Residential
+            </Button>
+            <Button
+              type="button"
+              variant={filters.type === 'commercial' ? 'default' : 'outline'}
+              className={filters.type === 'commercial' ? 'bg-estate-500 hover:bg-estate-600' : ''}
+              onClick={() => handleTypeFilter('commercial')}
+            >
+              <Building2 size={16} className="mr-2" />
+              Commercial
+            </Button>
+            <Button
+              type="button"
+              variant={filters.type === 'land' ? 'default' : 'outline'}
+              className={filters.type === 'land' ? 'bg-estate-500 hover:bg-estate-600' : ''}
+              onClick={() => handleTypeFilter('land')}
+            >
+              <MapPin size={16} className="mr-2" />
+              Land
+            </Button>
+          </div>
           
           {/* Expanded Filter Panel */}
           {isFilterOpen && (
@@ -253,6 +316,14 @@ const Properties = () => {
                   onClick={() => {
                     resetFilters();
                     setInitialLoad(false);
+                    
+                    // Notify user that filters have been reset
+                    toast({
+                      description: "All filters have been reset",
+                    });
+                    
+                    // Scroll to results after reset
+                    scrollToResults();
                   }}
                   className="text-sm text-muted-foreground hover:text-foreground flex items-center"
                 >
@@ -278,6 +349,9 @@ const Properties = () => {
                   Showing <span className="font-medium text-foreground">{filteredProperties.length}</span> properties
                   {searchTerm && !initialLoad && (
                     <span> for "<span className="font-medium text-estate-500">{searchTerm}</span>"</span>
+                  )}
+                  {filters.type && (
+                    <span> of type "<span className="font-medium text-estate-500">{filters.type}</span>"</span>
                   )}
                 </p>
               </div>
@@ -308,6 +382,11 @@ const Properties = () => {
                   resetFilters();
                   setSearchTerm('');
                   setInitialLoad(true);
+                  
+                  // Notify user that search has been reset
+                  toast({
+                    description: "Search has been reset",
+                  });
                 }}
                 className="bg-estate-500 text-white hover:bg-estate-600 transition-colors"
               >
