@@ -37,16 +37,18 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Use RPC to get job by ID
-      const { data, error } = await supabase
-        .rpc('get_job_by_id', { job_id: id });
+      // Use RPC to get job by ID with type assertion
+      const { data, error } = await supabase.rpc('get_job_by_id', { job_id: id }) as {
+        data: Job[] | null;
+        error: any;
+      };
       
       if (error) {
         throw error;
       }
       
       if (data && data.length > 0) {
-        setJob(data[0] as Job);
+        setJob(data[0]);
       } else {
         setJob(null);
       }
@@ -68,12 +70,14 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Use RPC to apply for job
-      const { error, data } = await supabase
-        .rpc('apply_for_job', { 
-          job_id: job.id,
-          worker_id: user.id 
-        });
+      // Use RPC to apply for job with type assertion
+      const { error, data } = await supabase.rpc('apply_for_job', { 
+        job_id: job.id,
+        worker_id: user.id 
+      }) as {
+        data: boolean | null;
+        error: any;
+      };
       
       if (error) {
         throw error;

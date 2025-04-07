@@ -44,15 +44,17 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Use RPC function to get new jobs
-      const { data, error } = await supabase
-        .rpc('get_new_jobs');
+      // Use RPC function to get new jobs with type assertion
+      const { data, error } = await supabase.rpc('get_new_jobs') as {
+        data: Job[] | null;
+        error: any;
+      };
       
       if (error) {
         throw error;
       }
       
-      setJobs(data as Job[] || []);
+      setJobs(data || []);
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
       toast({
