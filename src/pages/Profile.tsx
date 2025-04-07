@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit, Settings, User, Clock, History, CreditCard } from 'lucide-react';
@@ -94,7 +93,7 @@ export default function Profile() {
               </Button>
               <div className="flex flex-col items-center">
                 <Avatar className="h-24 w-24 mb-4">
-                  <AvatarImage src={user?.avatar} alt={user?.name || user?.email} />
+                  <AvatarImage src={user?.avatar_url} alt={user?.name || user?.email} />
                   <AvatarFallback className="text-lg">{getInitials()}</AvatarFallback>
                 </Avatar>
                 <CardTitle className="text-center">{user?.name || 'User'}</CardTitle>

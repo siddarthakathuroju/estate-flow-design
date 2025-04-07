@@ -55,18 +55,15 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Get all jobs with status "New"
+      // Use a stored procedure to get jobs with status "New"
       const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('status', 'New')
-        .order('created_at', { ascending: false });
+        .rpc('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
-      setJobs(data as Job[] || []);
+      setJobs(data as unknown as Job[] || []);
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
       toast({

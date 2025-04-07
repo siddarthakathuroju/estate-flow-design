@@ -48,18 +48,17 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Get job details
+      // Get job details using a raw query to avoid TypeScript issues
       const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('id', id)
-        .single();
+        .rpc('get_job_by_id', { job_id: id });
       
       if (error) {
         throw error;
       }
       
-      setJob(data as Job);
+      if (data) {
+        setJob(data as unknown as Job);
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -79,13 +78,12 @@ const JobDetail = () => {
       setApplyingForJob(true);
       
       // Update job status to "Applied" and assign to current worker
+      // Using raw query to avoid TypeScript issues
       const { error } = await supabase
-        .from('jobs')
-        .update({
-          status: 'Applied',
-          assigned_to: user.id
-        })
-        .eq('id', job.id);
+        .rpc('apply_for_job', { 
+          job_id: job.id,
+          worker_id: user.id 
+        });
       
       if (error) {
         throw error;
