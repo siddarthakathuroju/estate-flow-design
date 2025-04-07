@@ -9,7 +9,7 @@ export interface User {
   id: string;
   email: string;
   name?: string;
-  avatar?: string;
+  avatar_url?: string;
   password?: string; // Adding password as optional for internal use
   role?: UserRole;
 }
@@ -118,6 +118,7 @@ export const loginWithEmail = async (email: string, password: string): Promise<U
       email: data.user.email || email,
       name: profile?.name || data.user.email?.split('@')[0] || '',
       role: profile?.role as UserRole,
+      avatar_url: profile?.avatar_url,
     };
 
     // Save to localStorage
@@ -148,7 +149,7 @@ export const loginWithSocial = (provider: 'google' | 'github' | 'facebook'): Use
     id: crypto.randomUUID(),
     email: mockEmail,
     name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`,
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockEmail}`,
+    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockEmail}`,
     role: 'client' as UserRole,
   };
   

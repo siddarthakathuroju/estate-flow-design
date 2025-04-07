@@ -17,6 +17,9 @@ interface Job {
   pay_amount: number;
   status: string;
   created_at: string;
+  description?: string;
+  assigned_to?: string | null;
+  property_id?: string | null;
 }
 
 const WorkerJobs = () => {
@@ -51,6 +54,8 @@ const WorkerJobs = () => {
   const fetchNewJobs = async () => {
     try {
       setLoading(true);
+      
+      // Get all jobs with status "New"
       const { data, error } = await supabase
         .from('jobs')
         .select('*')
@@ -61,8 +66,9 @@ const WorkerJobs = () => {
         throw error;
       }
       
-      setJobs(data || []);
+      setJobs(data as Job[] || []);
     } catch (error: any) {
+      console.error('Error fetching jobs:', error);
       toast({
         variant: "destructive",
         title: "Error fetching jobs",

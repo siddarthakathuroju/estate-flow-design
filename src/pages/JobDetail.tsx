@@ -17,8 +17,8 @@ interface Job {
   pay_amount: number;
   status: string;
   created_at: string;
-  assigned_to?: string;
-  property_id?: string;
+  assigned_to?: string | null;
+  property_id?: string | null;
 }
 
 const JobDetail = () => {
@@ -47,6 +47,8 @@ const JobDetail = () => {
     
     try {
       setLoading(true);
+      
+      // Get job details
       const { data, error } = await supabase
         .from('jobs')
         .select('*')
@@ -57,7 +59,7 @@ const JobDetail = () => {
         throw error;
       }
       
-      setJob(data);
+      setJob(data as Job);
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -135,7 +137,7 @@ const JobDetail = () => {
     );
   }
 
-  const canApply = job.status === 'New' && job.assigned_to === null;
+  const canApply = job.status === 'New' && !job.assigned_to;
   const hasApplied = job.assigned_to === user?.id;
 
   return (

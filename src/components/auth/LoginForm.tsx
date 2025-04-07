@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { Facebook, Github, Mail, LogIn } from 'lucide-react';
 
@@ -52,6 +52,12 @@ export function LoginForm() {
           description: 'Welcome back to NFT Property',
         });
         navigate('/properties');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Login failed',
+          description: 'Please check your credentials and try again',
+        });
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -76,6 +82,12 @@ export function LoginForm() {
           description: `You've logged in with ${provider}`,
         });
         navigate('/properties');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Login failed',
+          description: 'An error occurred during social login',
+        });
       }
     } catch (error) {
       console.error(`${provider} login error:`, error);
