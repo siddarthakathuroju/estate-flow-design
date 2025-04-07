@@ -44,7 +44,7 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Fix: Properly handle the RPC call without type parameters
+      // Fix: Properly handle the RPC call
       const { data, error } = await supabase.rpc('get_new_jobs');
       
       if (error) {
