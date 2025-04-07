@@ -37,10 +37,10 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Fix: Use proper type parameters for RPC function
-      const { data, error } = await supabase.rpc<Job[], { job_id: string }>('get_job_by_id', { 
-        job_id: id 
-      });
+      // Correctly type the RPC function call
+      const { data, error } = await supabase
+        .rpc('get_job_by_id', { job_id: id })
+        .returns<Job[]>();
       
       if (error) {
         throw error;
@@ -69,11 +69,10 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Fix: Use proper type parameters for RPC function
-      const { error, data } = await supabase.rpc<boolean, { job_id: string, worker_id: string }>('apply_for_job', { 
-        job_id: job.id,
-        worker_id: user.id 
-      });
+      // Correctly type the RPC function call
+      const { error, data } = await supabase
+        .rpc('apply_for_job', { job_id: job.id, worker_id: user.id })
+        .returns<boolean>();
       
       if (error) {
         throw error;
@@ -149,11 +148,11 @@ const JobDetail = () => {
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-3xl">{job?.title}</CardTitle>
-                <CardDescription>Job ID: {job?.id}</CardDescription>
+                <CardTitle className="text-3xl">{job.title}</CardTitle>
+                <CardDescription>Job ID: {job.id}</CardDescription>
               </div>
               <span className="capitalize px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                {job?.status}
+                {job.status}
               </span>
             </div>
           </CardHeader>
@@ -162,20 +161,20 @@ const JobDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Job Type</h3>
-                <p>{job?.job_type}</p>
+                <p>{job.job_type}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Pay Amount</h3>
-                <p>${job?.pay_amount?.toLocaleString() || '0'}</p>
+                <p>${job.pay_amount?.toLocaleString() || '0'}</p>
               </div>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Job Description</h3>
-              <p className="whitespace-pre-wrap">{job?.description}</p>
+              <p className="whitespace-pre-wrap">{job.description}</p>
             </div>
             
-            {job?.status === 'New' && !job?.assigned_to && (
+            {canApply && (
               <Button 
                 onClick={handleApplyForJob} 
                 className="w-full sm:w-auto mt-4"
@@ -185,13 +184,13 @@ const JobDetail = () => {
               </Button>
             )}
             
-            {job?.assigned_to === user?.id && (
+            {hasApplied && (
               <div className="bg-green-50 border border-green-200 rounded p-4 text-green-700 mt-4">
                 You have applied for this job. The property manager will review your application.
               </div>
             )}
             
-            {job?.status !== 'New' && job?.assigned_to !== user?.id && (
+            {job.status !== 'New' && !hasApplied && (
               <div className="bg-amber-50 border border-amber-200 rounded p-4 text-amber-700 mt-4">
                 This job is no longer available for applications.
               </div>
