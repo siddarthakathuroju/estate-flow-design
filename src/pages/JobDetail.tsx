@@ -8,18 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-
-interface Job {
-  id: string;
-  job_type: string;
-  title: string;
-  description: string;
-  pay_amount: number;
-  status: string;
-  created_at: string;
-  assigned_to?: string | null;
-  property_id?: string | null;
-}
+import { Job } from '@/types/jobs';
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -48,7 +37,7 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Get job details using a raw query to avoid TypeScript issues
+      // Use RPC to get job by ID
       const { data, error } = await supabase
         .rpc('get_job_by_id', { job_id: id });
       
@@ -56,8 +45,10 @@ const JobDetail = () => {
         throw error;
       }
       
-      if (data) {
-        setJob(data as unknown as Job);
+      if (data && data.length > 0) {
+        setJob(data[0] as Job);
+      } else {
+        setJob(null);
       }
     } catch (error: any) {
       toast({
@@ -77,9 +68,8 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Update job status to "Applied" and assign to current worker
-      // Using raw query to avoid TypeScript issues
-      const { error } = await supabase
+      // Use RPC to apply for job
+      const { error, data } = await supabase
         .rpc('apply_for_job', { 
           job_id: job.id,
           worker_id: user.id 
@@ -89,13 +79,17 @@ const JobDetail = () => {
         throw error;
       }
       
-      toast({
-        title: "Application successful",
-        description: "You have successfully applied for this job",
-      });
-      
-      // Refresh job details
-      fetchJobDetails();
+      if (data === true) {
+        toast({
+          title: "Application successful",
+          description: "You have successfully applied for this job",
+        });
+        
+        // Refresh job details
+        fetchJobDetails();
+      } else {
+        throw new Error("Unable to apply for this job");
+      }
     } catch (error: any) {
       toast({
         variant: "destructive",

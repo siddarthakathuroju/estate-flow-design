@@ -9,18 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { Eye } from 'lucide-react';
-
-interface Job {
-  id: string;
-  job_type: string;
-  title: string;
-  pay_amount: number;
-  status: string;
-  created_at: string;
-  description?: string;
-  assigned_to?: string | null;
-  property_id?: string | null;
-}
+import { Job } from '@/types/jobs';
 
 const WorkerJobs = () => {
   const { isAuthenticated, isWorker } = useAuth();
@@ -55,7 +44,7 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Use a stored procedure to get jobs with status "New"
+      // Use RPC function to get new jobs
       const { data, error } = await supabase
         .rpc('get_new_jobs');
       
@@ -63,7 +52,7 @@ const WorkerJobs = () => {
         throw error;
       }
       
-      setJobs(data as unknown as Job[] || []);
+      setJobs(data as Job[] || []);
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
       toast({
