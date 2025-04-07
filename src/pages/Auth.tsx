@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
+import { ManagerRegisterForm } from '@/components/auth/ManagerRegisterForm';
+import { WorkerRegisterForm } from '@/components/auth/WorkerRegisterForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Wallet } from 'lucide-react';
@@ -55,15 +57,23 @@ const Auth = () => {
             </div>
             
             <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsList className="grid w-full grid-cols-4 mb-4">
                 <TabsTrigger value="login">Login</TabsTrigger>
                 <TabsTrigger value="register">Register</TabsTrigger>
+                <TabsTrigger value="manager">Manager</TabsTrigger>
+                <TabsTrigger value="worker">Worker</TabsTrigger>
               </TabsList>
               <TabsContent value="login">
                 <LoginForm />
               </TabsContent>
               <TabsContent value="register">
                 <RegisterForm />
+              </TabsContent>
+              <TabsContent value="manager">
+                <ManagerRegisterForm />
+              </TabsContent>
+              <TabsContent value="worker">
+                <WorkerRegisterForm />
               </TabsContent>
             </Tabs>
             
