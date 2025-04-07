@@ -10,6 +10,7 @@ import {
   User
 } from '@/services/authService';
 import { supabase } from '@/integrations/supabase/client';
+import { Tables } from '@/integrations/supabase/types';
 
 // Define the possible role types
 export type UserRole = 'manager' | 'worker' | 'client';
@@ -61,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return null;
       }
       
-      return data;
+      return data as Tables<'profiles'>;
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
       return null;
@@ -76,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (profile) {
       setUser({
         ...user,
-        role: profile.role,
+        role: profile.role as UserRole,
         name: profile.name || user.name,
         phone: profile.phone_text,
         address: profile.address,
@@ -96,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (profile) {
           setUser({
             ...currentUser,
-            role: profile.role,
+            role: profile.role as UserRole,
             phone: profile.phone_text,
             address: profile.address,
             verified: profile.verified,
@@ -128,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: session.user.id,
             email: session.user.email || '',
             name: profile?.name || session.user.email?.split('@')[0] || '',
-            role: profile?.role || 'client',
+            role: profile?.role as UserRole,
             phone: profile?.phone_text,
             address: profile?.address,
             verified: profile?.verified,
@@ -163,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: data.user.id,
           email: data.user.email || '',
           name: profile?.name || data.user.email?.split('@')[0] || '',
-          role: profile?.role || 'client',
+          role: profile?.role as UserRole,
           phone: profile?.phone_text,
           address: profile?.address,
           verified: profile?.verified,

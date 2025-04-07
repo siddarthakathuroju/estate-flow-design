@@ -2,6 +2,7 @@
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserRole } from "@/context/AuthContext";
+import { Tables } from "@/integrations/supabase/types";
 
 // Define the User type with proper structure
 export interface User {
