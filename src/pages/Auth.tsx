@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { ManagerRegisterForm } from '@/components/auth/ManagerRegisterForm';
@@ -9,9 +9,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Wallet } from 'lucide-react';
 import WalletConnect from '@/components/WalletConnect';
+import { useAuth } from '@/context/AuthContext';
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState('login');
+  const { isAuthenticated, user } = useAuth();
+
+  // Redirect authenticated users
+  if (isAuthenticated) {
+    // Redirect based on user role
+    if (user?.role === 'manager') {
+      return <Navigate to="/properties/manage" replace />;
+    } else {
+      return <Navigate to="/properties" replace />;
+    }
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
