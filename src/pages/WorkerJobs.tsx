@@ -43,8 +43,8 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Use RPC function to get new jobs with proper typing
-      const { data, error } = await supabase.rpc<Job[]>('get_new_jobs');
+      // Fix: Use proper type parameters for RPC function 
+      const { data, error } = await supabase.rpc<Job[], Record<string, never>>('get_new_jobs');
       
       if (error) {
         throw error;
