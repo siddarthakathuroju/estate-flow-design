@@ -1,280 +1,221 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  getCurrentUser, 
-  loginWithEmail, 
-  loginWithSocial, 
-  registerUser, 
-  logout, 
-  isLoggedIn,
-  User
-} from '@/services/authService';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Tables } from '@/integrations/supabase/types';
 
-// Define the possible role types
-export type UserRole = 'manager' | 'worker' | 'client';
-
-// Extend the User type to include role
-export interface ExtendedUser extends User {
-  role?: UserRole;
-  phone?: string;
-  address?: string;
-  verified?: boolean;
+interface UserProfile {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  created_at?: string;
+  updated_at?: string;
+  // Add other profile fields here
 }
 
-// Define the AuthContext type with KYC status and role
 interface AuthContextType {
-  user: ExtendedUser | null;
+  user: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  socialLogin: (provider: 'google' | 'github' | 'facebook') => Promise<boolean>;
-  register: (email: string, password: string, name?: string, role?: UserRole) => Promise<boolean>;
-  logout: () => void;
   isAuthenticated: boolean;
-  kycStatus: 'not_started' | 'pending' | 'verified';
-  updateKycStatus: (status: 'not_started' | 'pending' | 'verified') => void;
-  refreshUserProfile: () => Promise<void>;
   isManager: boolean;
   isWorker: boolean;
+  isClient: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, password: string, name: string, role?: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  updateProfile: (data: Partial<UserProfile>) => Promise<boolean>;
 }
 
-// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create a provider component
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<ExtendedUser | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [kycStatus, setKycStatus] = useState<'not_started' | 'pending' | 'verified'>('not_started');
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-  // Function to fetch user profile from Supabase
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const session = supabase.auth.getSession();
+
+    supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.session?.user) {
+        await fetchUserProfile(session.session.user.id);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+      setLoading(false);
+    });
+
+    if (session?.data?.session?.user) {
+      fetchUserProfile(session.data.session.user.id);
+      setIsAuthenticated(true);
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
         .single();
 
       if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
+        console.error('Error fetching profile:', error);
+        return;
       }
-      
-      return data as Tables<'profiles'>;
+
+      setUser(profile as UserProfile);
     } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
-      return null;
-    }
-  };
-
-  // Function to refresh the current user's profile
-  const refreshUserProfile = async () => {
-    if (!user?.id) return;
-    
-    const profile = await fetchUserProfile(user.id);
-    if (profile) {
-      setUser({
-        ...user,
-        role: profile.role as UserRole,
-        name: profile.name || user.name,
-        phone: profile.phone_text,
-        address: profile.address,
-        verified: profile.verified,
-      });
-    }
-  };
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const currentUser = getCurrentUser();
-      
-      if (currentUser?.id) {
-        const profile = await fetchUserProfile(currentUser.id);
-        
-        if (profile) {
-          setUser({
-            ...currentUser,
-            role: profile.role as UserRole,
-            phone: profile.phone_text,
-            address: profile.address,
-            verified: profile.verified,
-          });
-        } else {
-          setUser(currentUser);
-        }
-      } else {
-        setUser(null);
-      }
-      
-      // Check KYC status from localStorage
-      const savedKycStatus = localStorage.getItem('kyc_status');
-      if (savedKycStatus && ['not_started', 'pending', 'verified'].includes(savedKycStatus)) {
-        setKycStatus(savedKycStatus as 'not_started' | 'pending' | 'verified');
-      }
-      
+      console.error('Unexpected error fetching profile:', error);
+    } finally {
       setLoading(false);
-    };
-    
-    checkUser();
-
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          const profile = await fetchUserProfile(session.user.id);
-          const currentUser = {
-            id: session.user.id,
-            email: session.user.email || '',
-            name: profile?.name || session.user.email?.split('@')[0] || '',
-            role: profile?.role as UserRole,
-            phone: profile?.phone_text,
-            address: profile?.address,
-            verified: profile?.verified,
-          };
-          
-          setUser(currentUser);
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
-      }
-    );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+    }
+  };
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        throw error;
+        console.error('Login error:', error.message);
+        return false;
       }
-      
+
       if (data.user) {
-        const profile = await fetchUserProfile(data.user.id);
-        const loggedInUser = {
-          id: data.user.id,
-          email: data.user.email || '',
-          name: profile?.name || data.user.email?.split('@')[0] || '',
-          role: profile?.role as UserRole,
-          phone: profile?.phone_text,
-          address: profile?.address,
-          verified: profile?.verified,
-        };
-        
-        setUser(loggedInUser);
+        await fetchUserProfile(data.user.id);
+        setIsAuthenticated(true);
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login failed:', error);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const socialLogin = async (provider: 'google' | 'github' | 'facebook'): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        }
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      // For OAuth, we can't immediately set the user since it redirects
-      return !!data;
-    } catch (error) {
-      console.error('Social login error:', error);
-      return false;
-    }
-  };
-
-  const register = async (email: string, password: string, name?: string, role: UserRole = 'client'): Promise<boolean> => {
+  const register = async (email: string, password: string, name: string, role: string = 'client'): Promise<boolean> => {
+    setLoading(true);
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: email,
+        password: password,
         options: {
           data: {
-            name,
-            role,
+            name: name,
+            role: role,
           },
-        }
+        },
       });
-      
+
       if (error) {
-        throw error;
+        console.error('Registration error:', error.message);
+        return false;
       }
-      
+
       if (data.user) {
-        // We don't need to manually set the user here as the onAuthStateChange 
-        // listener will pick up the SIGNED_IN event
+        // Create a user profile in the profiles table
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([{ id: data.user.id, email, name, role }]);
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError.message);
+          // Optionally, delete the user if profile creation fails
+          await supabase.auth.signOut();
+          return false;
+        }
+
+        await fetchUserProfile(data.user.id);
+        setIsAuthenticated(true);
         return true;
       }
-      
+
       return false;
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Registration failed:', error);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleLogout = async () => {
+  const logout = async (): Promise<void> => {
+    setLoading(true);
     try {
-      await supabase.auth.signOut();
-      logout(); // Also call the local logout function to clear localStorage
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error.message);
+      }
       setUser(null);
+      setIsAuthenticated(false);
+      navigate('/auth');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Logout failed:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const updateKycStatus = (status: 'not_started' | 'pending' | 'verified') => {
-    setKycStatus(status);
-    localStorage.setItem('kyc_status', status);
+  const updateProfile = async (data: Partial<UserProfile>): Promise<boolean> => {
+    setLoading(true);
+    try {
+      if (!user) {
+        console.error('No user is currently logged in.');
+        return false;
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update(data)
+        .eq('id', user.id);
+
+      if (error) {
+        console.error('Profile update error:', error.message);
+        return false;
+      }
+
+      // Fetch the updated profile
+      await fetchUserProfile(user.id);
+      return true;
+    } catch (error) {
+      console.error('Profile update failed:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Calculate role-based permissions
   const isManager = user?.role === 'manager';
   const isWorker = user?.role === 'worker';
+  const isClient = user?.role === 'client';
 
-  // Provide the context value
   const value = {
     user,
     loading,
-    login,
-    socialLogin,
-    register,
-    logout: handleLogout,
-    isAuthenticated: isLoggedIn(),
-    kycStatus,
-    updateKycStatus,
-    refreshUserProfile,
+    isAuthenticated,
     isManager,
-    isWorker
+    isWorker,
+    isClient,
+    login,
+    register,
+    logout,
+    updateProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-// Create a custom hook for using the auth context
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+};

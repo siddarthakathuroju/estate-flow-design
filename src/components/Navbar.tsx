@@ -1,138 +1,185 @@
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTheme } from 'next-themes';
+import { useAuth } from '@/context/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { Moon, Sun, Menu, Briefcase, User } from 'lucide-react';
 
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Menu, X, Home, Building2, Info, Phone, BarChart3 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import WalletConnect from './WalletConnect';
-import UserMenu from './UserMenu';
+const NavbarLinks = [
+  { name: 'Home', href: '/' },
+  { name: 'Properties', href: '/properties' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/contact' },
+];
 
 const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-  const isMobile = useIsMobile();
+  const { theme, setTheme } = useTheme();
+  const { pathname } = useLocation();
+  const { user, isAuthenticated, logout, isWorker, isManager } = useAuth();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+  const toggleTheme = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
-  useEffect(() => {
-    // Close mobile menu when route changes
-    setIsMenuOpen(false);
-    
-    // Prevent body scroll when menu is open
-    if (isMenuOpen && isMobile) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [location, isMenuOpen, isMobile]);
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
 
-  const links = [
-    { path: '/', label: 'Home', icon: <Home size={16} /> },
-    { path: '/properties', label: 'Properties', icon: <Building2 size={16} /> },
-    { path: '/portfolio', label: 'Portfolio', icon: <BarChart3 size={16} /> },
-    { path: '/about', label: 'About', icon: <Info size={16} /> },
-    { path: '/contact', label: 'Contact', icon: <Phone size={16} /> }
-  ];
+  const handleLogout = async () => {
+    await logout();
+    navigate('/auth');
+  };
 
   return (
-    <header
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300 w-full',
-        isScrolled 
-          ? 'backdrop-blur-md bg-white/10 border-b border-white/10 py-2 shadow-lg'
-          : 'bg-transparent py-4'
-      )}
-    >
-      <div className="container mx-auto px-4 sm:px-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center">
-          <span className="text-xl font-semibold text-estate-600">NFT</span>
-          <span className="text-xl font-semibold ml-1">Property</span>
+    <nav className="bg-background border-b sticky top-0 z-50">
+      <div className="container flex items-center justify-between h-16">
+        {/* Logo */}
+        <Link to="/" className="flex items-center font-semibold text-2xl">
+          <span className="text-estate-600">NFT</span>
+          <span>Property</span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1">
-          {links.map(link => (
+        <div className="hidden lg:flex items-center space-x-6">
+          {NavbarLinks.map((link) => (
             <Link
-              key={link.path}
-              to={link.path}
-              className={cn(
-                'px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center',
-                location.pathname === link.path
-                  ? 'bg-gradient-to-r from-estate-400 to-estate-600 text-white shadow-md'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-white/10 backdrop-blur-sm'
-              )}
+              key={link.name}
+              to={link.href}
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                pathname === link.href ? 'text-primary' : 'text-muted-foreground'
+              }`}
             >
-              <span className="mr-1.5">{link.icon}</span>
-              {link.label}
+              {link.name}
             </Link>
           ))}
-          <div className="ml-3 flex items-center gap-2">
-            <WalletConnect />
-            <UserMenu />
-          </div>
-        </nav>
+          {isAuthenticated && isWorker && (
+            <Link
+              to="/jobs/new"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                pathname === '/jobs/new' ? 'text-primary' : 'text-muted-foreground'
+              }`}
+            >
+              Jobs
+            </Link>
+          )}
 
-        {/* Mobile Menu Button */}
-        <div className="flex items-center md:hidden gap-2">
-          <UserMenu />
-          <WalletConnect />
-          <Button 
-            variant="outline" 
-            size="icon"
-            className={cn(
-              'h-9 w-9 rounded-full',
-              isScrolled ? 'border-white/30 bg-white/10 backdrop-blur-sm' : 'border-transparent'
-            )}
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+          {/* Theme Toggle */}
+          <Button variant="ghost" size="sm" onClick={toggleTheme}>
+            {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           </Button>
+
+          {/* Profile Section */}
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-4">
+              <Link to="/profile">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.avatar_url || ""} alt={user?.name || "Profile"} />
+                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
+                </Avatar>
+              </Link>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Link to="/auth">
+              <Button size="sm">Sign In</Button>
+            </Link>
+          )}
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="lg:hidden">
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm" onClick={toggleMobileMenu}>
+                <Menu className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full sm:w-64">
+              <SheetHeader className="text-left">
+                <SheetTitle>Menu</SheetTitle>
+                <SheetDescription>
+                  Navigate through the application.
+                </SheetDescription>
+              </SheetHeader>
+              <div className="mt-4">
+                <ul className="divide-y divide-border-muted">
+                  {NavbarLinks.map((link) => (
+                    <li key={link.name}>
+                      <Link
+                        to={link.href}
+                        className="flex items-center gap-3 p-2 text-muted-foreground"
+                        onClick={closeMobileMenu}
+                      >
+                        <span>{link.name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                  {isAuthenticated && isWorker && (
+                    <li>
+                      <Link
+                        to="/jobs/new"
+                        className="flex items-center gap-3 p-2 text-muted-foreground"
+                        onClick={toggleMobileMenu}
+                      >
+                        <Briefcase className="h-5 w-5" />
+                        <span>Jobs</span>
+                      </Link>
+                    </li>
+                  )}
+                  {isAuthenticated ? (
+                    <>
+                      <li>
+                        <Link
+                          to="/profile"
+                          className="flex items-center gap-3 p-2 text-muted-foreground"
+                          onClick={toggleMobileMenu}
+                        >
+                          <User className="h-5 w-5" />
+                          <span>Profile</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Button variant="outline" className="w-full justify-start gap-2 mt-2" size="sm" onClick={handleLogout}>
+                          <User className="h-4 w-4" />
+                          Logout
+                        </Button>
+                      </li>
+                    </>
+                  ) : (
+                    <li>
+                      <Link to="/auth" className="flex items-center gap-3 p-2 text-muted-foreground" onClick={toggleMobileMenu}>
+                        <span>Sign In</span>
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+                <Button variant="ghost" size="sm" onClick={toggleTheme} className="w-full justify-start gap-2 mt-4">
+                  {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      {/* Mobile Navigation */}
-      <div 
-        className={cn(
-          'md:hidden fixed inset-0 top-[57px] bg-black/80 backdrop-blur-md z-40 transition-transform duration-300 ease-in-out',
-          isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-        )}
-      >
-        <nav className="flex flex-col space-y-2 p-4 h-full">
-          {links.map(link => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={cn(
-                'mobile-nav-item flex items-center p-4 rounded-lg',
-                location.pathname === link.path
-                  ? 'bg-gradient-to-r from-estate-400/80 to-estate-600 text-white shadow-md'
-                  : 'text-white hover:bg-white/10'
-              )}
-            >
-              <span className="mr-3">{link.icon}</span>
-              <span className="text-lg">{link.label}</span>
-            </Link>
-          ))}
-        </nav>
-      </div>
-    </header>
+    </nav>
   );
 };
 
