@@ -44,18 +44,15 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Fix: Use type assertion to explicitly specify the return type
-      const { data, error } = await supabase.rpc('get_new_jobs') as { 
-        data: Job[] | null, 
-        error: Error | null 
-      };
+      // Use generic type parameter for the return type
+      const { data, error } = await supabase.rpc<Job[]>('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
       if (data && Array.isArray(data)) {
-        setJobs(data as Job[]);
+        setJobs(data);
       } else {
         setJobs([]);
       }
