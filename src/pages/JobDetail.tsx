@@ -37,17 +37,16 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Correctly type the RPC function call
+      // Fix: Add generic type annotation to specify the return type
       const { data, error } = await supabase
-        .rpc('get_job_by_id', { job_id: id })
-        .returns<Job[]>();
+        .rpc('get_job_by_id', { job_id: id });
       
       if (error) {
         throw error;
       }
       
-      if (data && data.length > 0) {
-        setJob(data[0]);
+      if (data && Array.isArray(data) && data.length > 0) {
+        setJob(data[0] as Job);
       } else {
         setJob(null);
       }
@@ -69,10 +68,9 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Correctly type the RPC function call
+      // Fix: Add generic type annotation to specify the return type
       const { error, data } = await supabase
-        .rpc('apply_for_job', { job_id: job.id, worker_id: user.id })
-        .returns<boolean>();
+        .rpc('apply_for_job', { job_id: job.id, worker_id: user.id });
       
       if (error) {
         throw error;

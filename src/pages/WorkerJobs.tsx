@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -43,16 +44,18 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Correctly type the RPC function call
-      const { data, error } = await supabase
-        .rpc('get_new_jobs')
-        .returns<Job[]>();
+      // Fix: Properly handle the RPC call without type parameters
+      const { data, error } = await supabase.rpc('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
-      setJobs(data || []);
+      if (data && Array.isArray(data)) {
+        setJobs(data as Job[]);
+      } else {
+        setJobs([]);
+      }
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
       toast({
