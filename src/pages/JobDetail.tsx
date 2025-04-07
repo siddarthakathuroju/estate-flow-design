@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -37,11 +36,10 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Use RPC to get job by ID with type assertion
-      const { data, error } = await supabase.rpc('get_job_by_id', { job_id: id }) as {
-        data: Job[] | null;
-        error: any;
-      };
+      // Use RPC to get job by ID with proper type parameters
+      const { data, error } = await supabase.rpc<Job[]>('get_job_by_id', { 
+        job_id: id 
+      });
       
       if (error) {
         throw error;
@@ -70,14 +68,11 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Use RPC to apply for job with type assertion
-      const { error, data } = await supabase.rpc('apply_for_job', { 
+      // Use RPC to apply for job with proper type parameters
+      const { error, data } = await supabase.rpc<boolean>('apply_for_job', { 
         job_id: job.id,
         worker_id: user.id 
-      }) as {
-        data: boolean | null;
-        error: any;
-      };
+      });
       
       if (error) {
         throw error;

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -44,11 +43,8 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Use RPC function to get new jobs with type assertion
-      const { data, error } = await supabase.rpc('get_new_jobs') as {
-        data: Job[] | null;
-        error: any;
-      };
+      // Use RPC function to get new jobs with proper typing
+      const { data, error } = await supabase.rpc<Job[]>('get_new_jobs');
       
       if (error) {
         throw error;
