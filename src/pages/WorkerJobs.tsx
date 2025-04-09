@@ -44,14 +44,14 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.rpc('get_new_jobs');
+      const { data, error } = await supabase.rpc<Job[]>('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
       if (data && Array.isArray(data)) {
-        setJobs(data as Job[]);
+        setJobs(data);
       } else {
         setJobs([]);
       }
