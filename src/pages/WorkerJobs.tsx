@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -44,14 +43,15 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.rpc<Job[], Record<string, never>>('get_new_jobs');
+      // Fix: Correct approach for supabase.rpc with no parameters
+      const { data, error } = await supabase.rpc('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
       if (data && Array.isArray(data)) {
-        setJobs(data);
+        setJobs(data as Job[]);
       } else {
         setJobs([]);
       }
