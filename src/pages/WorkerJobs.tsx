@@ -44,15 +44,18 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Fix: use a more appropriate approach for RPC calls
+      // Use type assertion for the RPC call
       const { data, error } = await supabase.rpc('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
-      if (data) {
-        setJobs(data as Job[]);
+      // Type assertion for the returned data
+      const jobsData = data as unknown as Job[];
+      
+      if (jobsData) {
+        setJobs(jobsData);
       } else {
         setJobs([]);
       }

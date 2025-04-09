@@ -48,18 +48,21 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Fix: use a more appropriate approach for RPC calls
+      // Use type assertion with the RPC call
       const { data, error } = await supabase.rpc(
         'get_job_by_id', 
-        { job_id: id }
+        { job_id: id } as GetJobByIdParams
       );
       
       if (error) {
         throw error;
       }
       
-      if (data && Array.isArray(data) && data.length > 0) {
-        setJob(data[0] as Job);
+      // Type assertion for the returned data
+      const jobsData = data as unknown as Job[];
+      
+      if (jobsData && Array.isArray(jobsData) && jobsData.length > 0) {
+        setJob(jobsData[0]);
       } else {
         setJob(null);
       }
@@ -81,17 +84,20 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Fix: use a more appropriate approach for RPC calls
+      // Use type assertion with the RPC call
       const { data, error } = await supabase.rpc(
         'apply_for_job', 
-        { job_id: job.id, worker_id: user.id }
+        { job_id: job.id, worker_id: user.id } as ApplyForJobParams
       );
       
       if (error) {
         throw error;
       }
       
-      if (data === true) {
+      // Type assertion for the returned data
+      const result = data as boolean;
+      
+      if (result === true) {
         toast({
           title: "Application successful",
           description: "You have successfully applied for this job",
