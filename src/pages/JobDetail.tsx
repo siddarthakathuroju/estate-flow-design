@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -10,16 +9,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { Job } from '@/types/jobs';
-
-// Define proper type declarations for the RPC functions
-interface GetJobByIdParams {
-  job_id: string;
-}
-
-interface ApplyForJobParams {
-  job_id: string;
-  worker_id: string;
-}
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -48,7 +37,7 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Fix: Use type assertion for RPC function call
+      // Fix: Use proper typing for RPC call by removing generic parameters
       const { data, error } = await supabase.rpc('get_job_by_id', {
         job_id: id
       });
@@ -57,6 +46,7 @@ const JobDetail = () => {
         throw error;
       }
       
+      // Fix: Handle the data properly
       if (data && Array.isArray(data) && data.length > 0) {
         setJob(data[0] as Job);
       } else {
@@ -80,7 +70,7 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Fix: Use type assertion for RPC function call
+      // Fix: Use proper typing for RPC call by removing generic parameters
       const { data, error } = await supabase.rpc('apply_for_job', {
         job_id: job.id,
         worker_id: user.id
