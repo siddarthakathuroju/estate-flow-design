@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -48,11 +47,10 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Use RPC call without explicit generic and use type assertion after
-      const { data, error } = await supabase.rpc(
-        'get_job_by_id', 
-        { job_id: id } as GetJobByIdParams
-      );
+      // Use the proper typing approach with the Supabase client
+      const { data, error } = await supabase.rpc('get_job_by_id', {
+        job_id: id
+      });
       
       if (error) {
         throw error;
@@ -84,11 +82,11 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Use RPC call without explicit generic and use type assertion after
-      const { data, error } = await supabase.rpc(
-        'apply_for_job', 
-        { job_id: job.id, worker_id: user.id } as ApplyForJobParams
-      );
+      // Use the proper typing approach with the Supabase client
+      const { data, error } = await supabase.rpc('apply_for_job', {
+        job_id: job.id,
+        worker_id: user.id
+      });
       
       if (error) {
         throw error;
