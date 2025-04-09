@@ -35,9 +35,9 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.rpc<Job[]>(
+      const { data, error } = await supabase.rpc<Job, GetJobByIdParams>(
         'get_job_by_id', 
-        { job_id: id } as unknown as Record<string, never>
+        { job_id: id }
       );
       
       if (error) {
@@ -67,12 +67,12 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setApplyingForJob(true);
       
-      const { data, error } = await supabase.rpc<boolean>(
+      const { data, error } = await supabase.rpc<boolean, ApplyForJobParams>(
         'apply_for_job', 
         { 
           job_id: job.id, 
           worker_id: userId 
-        } as unknown as Record<string, never>
+        }
       );
       
       if (error) {
