@@ -20,14 +20,15 @@ export function useWorkerJobs() {
     try {
       setLoading(true);
       
-      // Fix: Use any type for the RPC call and handle the response as Job[]
-      const { data, error } = await supabase.rpc('get_new_jobs', {});
+      // Don't provide generic type parameters to the RPC call
+      const { data, error } = await supabase.rpc('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
       if (data) {
+        // Type assertion after we've received the data
         setJobs(data as Job[]);
       } else {
         setJobs([]);

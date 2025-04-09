@@ -35,13 +35,14 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setLoading(true);
       
-      // Fix: Use any type for the RPC call and then type the response
-      const { data, error } = await supabase.rpc('get_job_by_id', { job_id: id } as GetJobByIdParams);
+      // Use type assertion for parameters and don't provide generic type parameters
+      const { data, error } = await supabase.rpc('get_job_by_id', { job_id: id });
       
       if (error) {
         throw error;
       }
       
+      // Type the response data properly
       if (data && Array.isArray(data) && data.length > 0) {
         setJob(data[0] as Job);
       } else {
@@ -65,13 +66,13 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setApplyingForJob(true);
       
-      // Fix: Use any type for the RPC call and then check the response
+      // Use type assertion for parameters and don't provide generic type parameters
       const { data, error } = await supabase.rpc(
         'apply_for_job', 
         { 
           job_id: job.id, 
           worker_id: userId 
-        } as ApplyForJobParams
+        }
       );
       
       if (error) {
