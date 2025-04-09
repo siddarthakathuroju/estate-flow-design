@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -9,6 +10,16 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { Job } from '@/types/jobs';
+
+// Define interface for RPC function parameters
+interface GetJobByIdParams {
+  job_id: string;
+}
+
+interface ApplyForJobParams {
+  job_id: string;
+  worker_id: string;
+}
 
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,18 +48,17 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Fix: Use proper typing for RPC call by removing generic parameters
-      const { data, error } = await supabase.rpc('get_job_by_id', {
+      // Fix: Add explicit typing for the RPC call parameters
+      const { data, error } = await supabase.rpc<Job[]>('get_job_by_id', {
         job_id: id
-      });
+      } as GetJobByIdParams);
       
       if (error) {
         throw error;
       }
       
-      // Fix: Handle the data properly
       if (data && Array.isArray(data) && data.length > 0) {
-        setJob(data[0] as Job);
+        setJob(data[0]);
       } else {
         setJob(null);
       }
@@ -70,11 +80,11 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Fix: Use proper typing for RPC call by removing generic parameters
-      const { data, error } = await supabase.rpc('apply_for_job', {
+      // Fix: Add explicit typing for the RPC call parameters
+      const { data, error } = await supabase.rpc<boolean>('apply_for_job', {
         job_id: job.id,
         worker_id: user.id
-      });
+      } as ApplyForJobParams);
       
       if (error) {
         throw error;
@@ -165,11 +175,11 @@ const JobDetail = () => {
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-3xl">{job.title}</CardTitle>
-                <CardDescription>Job ID: {job.id}</CardDescription>
+                <CardTitle className="text-3xl">{job?.title}</CardTitle>
+                <CardDescription>Job ID: {job?.id}</CardDescription>
               </div>
               <span className="capitalize px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                {job.status}
+                {job?.status}
               </span>
             </div>
           </CardHeader>
@@ -178,39 +188,43 @@ const JobDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Job Type</h3>
-                <p>{job.job_type}</p>
+                <p>{job?.job_type}</p>
               </div>
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-1">Pay Amount</h3>
-                <p>${job.pay_amount?.toLocaleString() || '0'}</p>
+                <p>${job?.pay_amount?.toLocaleString() || '0'}</p>
               </div>
             </div>
             
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Job Description</h3>
-              <p className="whitespace-pre-wrap">{job.description}</p>
+              <p className="whitespace-pre-wrap">{job?.description}</p>
             </div>
             
-            {canApply && (
-              <Button 
-                onClick={handleApplyForJob} 
-                className="w-full sm:w-auto mt-4"
-                disabled={applyingForJob}
-              >
-                {applyingForJob ? 'Applying...' : 'Apply for Job'}
-              </Button>
-            )}
-            
-            {hasApplied && (
-              <div className="bg-green-50 border border-green-200 rounded p-4 text-green-700 mt-4">
-                You have applied for this job. The property manager will review your application.
-              </div>
-            )}
-            
-            {job.status !== 'New' && !hasApplied && (
-              <div className="bg-amber-50 border border-amber-200 rounded p-4 text-amber-700 mt-4">
-                This job is no longer available for applications.
-              </div>
+            {job && user && (
+              <>
+                {job.status === 'New' && !job.assigned_to && (
+                  <Button 
+                    onClick={handleApplyForJob} 
+                    className="w-full sm:w-auto mt-4"
+                    disabled={applyingForJob}
+                  >
+                    {applyingForJob ? 'Applying...' : 'Apply for Job'}
+                  </Button>
+                )}
+                
+                {job.assigned_to === user.id && (
+                  <div className="bg-green-50 border border-green-200 rounded p-4 text-green-700 mt-4">
+                    You have applied for this job. The property manager will review your application.
+                  </div>
+                )}
+                
+                {job.status !== 'New' && job.assigned_to !== user.id && (
+                  <div className="bg-amber-50 border border-amber-200 rounded p-4 text-amber-700 mt-4">
+                    This job is no longer available for applications.
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>

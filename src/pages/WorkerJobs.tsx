@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -44,15 +43,15 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Fix: Remove generic type parameter from RPC call
-      const { data, error } = await supabase.rpc('get_new_jobs');
+      // Fix: Add explicit typing for the RPC call
+      const { data, error } = await supabase.rpc<Job[]>('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
       if (data) {
-        setJobs(data as Job[]);
+        setJobs(data);
       } else {
         setJobs([]);
       }
@@ -135,7 +134,7 @@ const WorkerJobs = () => {
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => handleViewJob(job.id)}
+                        onClick={() => navigate(`/jobs/${job.id}`)}
                         className="flex items-center gap-1"
                       >
                         <Eye className="h-4 w-4" /> View
