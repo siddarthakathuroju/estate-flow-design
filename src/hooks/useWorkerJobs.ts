@@ -20,18 +20,15 @@ export function useWorkerJobs() {
     try {
       setLoading(true);
       
-      // Using explicit typing for the response data
-      const { data, error } = await supabase.rpc('get_new_jobs', {}) as {
-        data: Job[];
-        error: any;
-      };
+      // Fix: Use any type for the RPC call and handle the response as Job[]
+      const { data, error } = await supabase.rpc('get_new_jobs', {});
       
       if (error) {
         throw error;
       }
       
       if (data) {
-        setJobs(data);
+        setJobs(data as Job[]);
       } else {
         setJobs([]);
       }
