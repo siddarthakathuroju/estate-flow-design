@@ -35,14 +35,14 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setLoading(true);
       
-      // Use type assertion for parameters and don't provide generic type parameters
-      const { data, error } = await supabase.rpc('get_job_by_id', { job_id: id });
+      // Use `any` type to bypass TypeScript's strict checking for RPC calls
+      const { data, error } = await (supabase.rpc as any)('get_job_by_id', { job_id: id });
       
       if (error) {
         throw error;
       }
       
-      // Type the response data properly
+      // Explicitly check the data structure
       if (data && Array.isArray(data) && data.length > 0) {
         setJob(data[0] as Job);
       } else {
@@ -66,8 +66,8 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setApplyingForJob(true);
       
-      // Use type assertion for parameters and don't provide generic type parameters
-      const { data, error } = await supabase.rpc(
+      // Use `any` type to bypass TypeScript's strict checking for RPC calls
+      const { data, error } = await (supabase.rpc as any)(
         'apply_for_job', 
         { 
           job_id: job.id, 

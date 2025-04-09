@@ -20,8 +20,8 @@ export function useWorkerJobs() {
     try {
       setLoading(true);
       
-      // Don't provide generic type parameters to the RPC call
-      const { data, error } = await supabase.rpc('get_new_jobs');
+      // Use `any` type to bypass TypeScript's strict checking for RPC calls
+      const { data, error } = await (supabase.rpc as any)('get_new_jobs');
       
       if (error) {
         throw error;
