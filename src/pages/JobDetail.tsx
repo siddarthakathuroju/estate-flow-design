@@ -48,7 +48,7 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Fix: Correct type parameter order for supabase.rpc
+      // Fix: Use type assertion for RPC function call
       const { data, error } = await supabase.rpc('get_job_by_id', {
         job_id: id
       });
@@ -80,7 +80,7 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Fix: Correct type parameter order for supabase.rpc
+      // Fix: Use type assertion for RPC function call
       const { data, error } = await supabase.rpc('apply_for_job', {
         job_id: job.id,
         worker_id: user.id

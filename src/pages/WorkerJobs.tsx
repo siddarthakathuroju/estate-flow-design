@@ -44,14 +44,14 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Fix: Correct approach for supabase.rpc with no parameters
+      // Fix: Use the correct typing for RPC call with no parameters
       const { data, error } = await supabase.rpc('get_new_jobs');
       
       if (error) {
         throw error;
       }
       
-      if (data && Array.isArray(data)) {
+      if (data) {
         setJobs(data as Job[]);
       } else {
         setJobs([]);
