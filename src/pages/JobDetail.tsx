@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import { Job } from '@/types/jobs';
 
-// Define interface for RPC function parameters
+// Define interfaces for RPC function parameters
 interface GetJobByIdParams {
   job_id: string;
 }
@@ -48,7 +48,7 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Use type assertion with the RPC call
+      // Use RPC call without explicit generic and use type assertion after
       const { data, error } = await supabase.rpc(
         'get_job_by_id', 
         { job_id: id } as GetJobByIdParams
@@ -59,7 +59,7 @@ const JobDetail = () => {
       }
       
       // Type assertion for the returned data
-      const jobsData = data as unknown as Job[];
+      const jobsData = data as Job[];
       
       if (jobsData && Array.isArray(jobsData) && jobsData.length > 0) {
         setJob(jobsData[0]);
@@ -84,7 +84,7 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Use type assertion with the RPC call
+      // Use RPC call without explicit generic and use type assertion after
       const { data, error } = await supabase.rpc(
         'apply_for_job', 
         { job_id: job.id, worker_id: user.id } as ApplyForJobParams
