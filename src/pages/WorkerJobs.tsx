@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -43,8 +44,8 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Call the RPC function without parameters
-      const { data, error } = await supabase.rpc('get_new_jobs');
+      // Explicitly call RPC function without parameters
+      const { data, error } = await supabase.rpc('get_new_jobs', {});
       
       if (error) {
         throw error;

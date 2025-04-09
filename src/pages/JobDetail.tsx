@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -48,9 +47,11 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Specify the parameter type
-      const params: GetJobByIdParams = { job_id: id };
-      const { data, error } = await supabase.rpc('get_job_by_id', params);
+      // Explicitly type the parameters and call with string literals
+      const { data, error } = await supabase.rpc(
+        'get_job_by_id', 
+        { job_id: id } as GetJobByIdParams
+      );
       
       if (error) {
         throw error;
@@ -82,12 +83,14 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Specify the parameter type
-      const params: ApplyForJobParams = {
-        job_id: job.id,
-        worker_id: user.id
-      };
-      const { data, error } = await supabase.rpc('apply_for_job', params);
+      // Explicitly type the parameters
+      const { data, error } = await supabase.rpc(
+        'apply_for_job', 
+        { 
+          job_id: job.id, 
+          worker_id: user.id 
+        } as ApplyForJobParams
+      );
       
       if (error) {
         throw error;
@@ -161,8 +164,8 @@ const JobDetail = () => {
     );
   }
 
-  const canApply = job.status === 'New' && !job.assigned_to;
-  const hasApplied = job.assigned_to === user?.id;
+  const canApply = job?.status === 'New' && !job.assigned_to;
+  const hasApplied = job?.assigned_to === user?.id;
 
   return (
     <div className="min-h-screen flex flex-col">
