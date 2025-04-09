@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -7,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft } from 'lucide-react';
 import { Job } from '@/types/jobs';
 
 // Define proper type declarations for the RPC functions
@@ -114,8 +116,17 @@ const JobDetail = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex-1 container pt-24 pb-12 flex items-center justify-center">
-          <p>Loading job details...</p>
+        <div className="flex-1 container pt-24 pb-12">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/jobs/new')}
+            className="mb-6 flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to Jobs
+          </Button>
+          <div className="flex items-center justify-center h-64">
+            <p>Loading job details...</p>
+          </div>
         </div>
         <Footer />
       </div>
@@ -126,11 +137,17 @@ const JobDetail = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex-1 container pt-24 pb-12 flex items-center justify-center">
+        <div className="flex-1 container pt-24 pb-12">
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/jobs/new')}
+            className="mb-6 flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back to Jobs
+          </Button>
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2">Job Not Found</h2>
             <p className="text-muted-foreground mb-4">The job you're looking for doesn't exist or has been removed.</p>
-            <Button onClick={() => navigate('/jobs/new')}>Back to Jobs</Button>
           </div>
         </div>
         <Footer />
@@ -149,9 +166,9 @@ const JobDetail = () => {
         <Button 
           variant="outline" 
           onClick={() => navigate('/jobs/new')}
-          className="mb-6"
+          className="mb-6 flex items-center gap-2"
         >
-          Back to Jobs
+          <ArrowLeft className="h-4 w-4" /> Back to Jobs
         </Button>
         
         <Card className="mb-8">

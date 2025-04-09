@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -7,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { Eye } from 'lucide-react';
+import { Eye, ArrowLeft } from 'lucide-react';
 import { Job } from '@/types/jobs';
 
 const WorkerJobs = () => {
@@ -76,6 +77,14 @@ const WorkerJobs = () => {
       <Navbar />
       
       <div className="flex-1 container pt-24 pb-12">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/')}
+          className="mb-6 flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to Home
+        </Button>
+        
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold">New Jobs</h1>
