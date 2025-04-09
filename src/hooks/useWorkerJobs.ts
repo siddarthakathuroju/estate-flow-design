@@ -5,9 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Job } from '@/types/jobs';
 
-// Define empty interface for no parameters
-interface EmptyParams {}
-
 export function useWorkerJobs() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -23,10 +20,11 @@ export function useWorkerJobs() {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.rpc<Job[], EmptyParams>(
-        'get_new_jobs', 
-        {}
-      );
+      // Using explicit typing for the response data
+      const { data, error } = await supabase.rpc('get_new_jobs', {}) as {
+        data: Job[];
+        error: any;
+      };
       
       if (error) {
         throw error;
