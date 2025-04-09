@@ -44,7 +44,7 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.rpc<Job[]>('get_new_jobs');
+      const { data, error } = await supabase.rpc<Job[], Record<string, never>>('get_new_jobs');
       
       if (error) {
         throw error;

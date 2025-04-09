@@ -47,9 +47,9 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.rpc<Job[]>('get_job_by_id', {
+      const { data, error } = await supabase.rpc<Job[], GetJobByIdParams>('get_job_by_id', {
         job_id: id
-      } as GetJobByIdParams);
+      });
       
       if (error) {
         throw error;
@@ -78,10 +78,10 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      const { data, error } = await supabase.rpc<boolean>('apply_for_job', {
+      const { data, error } = await supabase.rpc<boolean, ApplyForJobParams>('apply_for_job', {
         job_id: job.id,
         worker_id: user.id
-      } as ApplyForJobParams);
+      });
       
       if (error) {
         throw error;
