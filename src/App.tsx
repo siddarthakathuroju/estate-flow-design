@@ -29,8 +29,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="light">
         <Web3ReactProvider connectors={connectors}>
-          <AuthProvider>
-            <Router>
+          <Router>
+            <AuthProvider>
               <div className="flex flex-col min-h-screen">
                 <Routes>
                   <Route path="/" element={<Index />} />
@@ -48,9 +48,9 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
-            </Router>
-            <Toaster />
-          </AuthProvider>
+              <Toaster />
+            </AuthProvider>
+          </Router>
         </Web3ReactProvider>
       </ThemeProvider>
     </QueryClientProvider>

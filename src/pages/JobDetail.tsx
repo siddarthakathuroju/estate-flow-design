@@ -10,10 +10,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Job } from '@/types/jobs';
 
-// Define proper RPC function types
-type GetJobByIdParams = { job_id: string };
-type ApplyForJobParams = { job_id: string; worker_id: string };
-
 const JobDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { isAuthenticated, user } = useAuth();
@@ -41,17 +37,16 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Use properly typed parameters
-      const { data, error } = await supabase.rpc<Job[]>('get_job_by_id', {
+      const { data, error } = await supabase.rpc('get_job_by_id', {
         job_id: id
-      } as GetJobByIdParams);
+      });
       
       if (error) {
         throw error;
       }
       
       if (data && Array.isArray(data) && data.length > 0) {
-        setJob(data[0]);
+        setJob(data[0] as Job);
       } else {
         setJob(null);
       }
@@ -73,11 +68,10 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Use properly typed parameters
-      const { data, error } = await supabase.rpc<boolean>('apply_for_job', {
+      const { data, error } = await supabase.rpc('apply_for_job', {
         job_id: job.id,
         worker_id: user.id
-      } as ApplyForJobParams);
+      });
       
       if (error) {
         throw error;
