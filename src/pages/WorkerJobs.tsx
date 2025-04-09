@@ -1,79 +1,35 @@
 
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import { Eye, ArrowLeft } from 'lucide-react';
-import { Job } from '@/types/jobs';
+import { useWorkerJobs } from '@/hooks/useWorkerJobs';
 
 const WorkerJobs = () => {
   const { isAuthenticated, isWorker } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { jobs, loading } = useWorkerJobs();
+
+  // Redirect if not authenticated or not a worker
+  if (!isAuthenticated) {
+    navigate('/auth', { state: { from: '/jobs/new' } });
+    return null;
+  }
   
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Redirect if not authenticated or not a worker
-    if (!isAuthenticated) {
-      navigate('/auth', { state: { from: '/jobs/new' } });
-      return;
-    }
-    
-    if (!isWorker) {
-      navigate('/');
-      toast({
-        variant: "destructive",
-        title: "Access denied",
-        description: "You need worker permissions to access this page",
-      });
-      return;
-    }
-    
-    // Fetch new jobs
-    fetchNewJobs();
-  }, [isAuthenticated, isWorker, navigate]);
-
-  const fetchNewJobs = async () => {
-    try {
-      setLoading(true);
-      
-      // Explicitly call RPC function without parameters
-      const { data, error } = await supabase.rpc('get_new_jobs', {});
-      
-      if (error) {
-        throw error;
-      }
-      
-      // Type assertion for the returned data
-      const jobsData = data as Job[];
-      
-      if (jobsData) {
-        setJobs(jobsData);
-      } else {
-        setJobs([]);
-      }
-    } catch (error: any) {
-      console.error('Error fetching jobs:', error);
-      toast({
-        variant: "destructive",
-        title: "Error fetching jobs",
-        description: error.message || "Could not load jobs",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleViewJob = (jobId: string) => {
-    navigate(`/jobs/${jobId}`);
-  };
+  if (!isWorker) {
+    navigate('/');
+    toast({
+      variant: "destructive",
+      title: "Access denied",
+      description: "You need worker permissions to access this page",
+    });
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
