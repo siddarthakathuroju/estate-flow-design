@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -43,8 +44,8 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Fix: Add explicit typing for the RPC call
-      const { data, error } = await supabase.rpc<Job[]>('get_new_jobs');
+      // Fix: Use correct typing for the RPC call
+      const { data, error } = await supabase.rpc<Job[], null>('get_new_jobs');
       
       if (error) {
         throw error;

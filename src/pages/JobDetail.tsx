@@ -48,10 +48,10 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Fix: Add explicit typing for the RPC call parameters
-      const { data, error } = await supabase.rpc<Job[]>('get_job_by_id', {
+      // Fix: Use correct typing for the RPC call
+      const { data, error } = await supabase.rpc<Job[], GetJobByIdParams>('get_job_by_id', {
         job_id: id
-      } as GetJobByIdParams);
+      });
       
       if (error) {
         throw error;
@@ -80,11 +80,11 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Fix: Add explicit typing for the RPC call parameters
-      const { data, error } = await supabase.rpc<boolean>('apply_for_job', {
+      // Fix: Use correct typing for the RPC call
+      const { data, error } = await supabase.rpc<boolean, ApplyForJobParams>('apply_for_job', {
         job_id: job.id,
         worker_id: user.id
-      } as ApplyForJobParams);
+      });
       
       if (error) {
         throw error;
