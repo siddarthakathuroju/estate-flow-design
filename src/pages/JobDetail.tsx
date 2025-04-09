@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -47,10 +48,9 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Use the proper typing approach with the Supabase client
-      const { data, error } = await supabase.rpc('get_job_by_id', {
-        job_id: id
-      });
+      // Specify the parameter type
+      const params: GetJobByIdParams = { job_id: id };
+      const { data, error } = await supabase.rpc('get_job_by_id', params);
       
       if (error) {
         throw error;
@@ -82,11 +82,12 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Use the proper typing approach with the Supabase client
-      const { data, error } = await supabase.rpc('apply_for_job', {
+      // Specify the parameter type
+      const params: ApplyForJobParams = {
         job_id: job.id,
         worker_id: user.id
-      });
+      };
+      const { data, error } = await supabase.rpc('apply_for_job', params);
       
       if (error) {
         throw error;

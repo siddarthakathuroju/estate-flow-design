@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -44,7 +43,7 @@ const WorkerJobs = () => {
     try {
       setLoading(true);
       
-      // Use the proper typing approach with the Supabase client
+      // Call the RPC function without parameters
       const { data, error } = await supabase.rpc('get_new_jobs');
       
       if (error) {
