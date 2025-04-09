@@ -48,17 +48,18 @@ const JobDetail = () => {
     try {
       setLoading(true);
       
-      // Fix: Use correct typing for the RPC call
-      const { data, error } = await supabase.rpc<Job[], GetJobByIdParams>('get_job_by_id', {
-        job_id: id
-      });
+      // Fix: use a more appropriate approach for RPC calls
+      const { data, error } = await supabase.rpc(
+        'get_job_by_id', 
+        { job_id: id }
+      );
       
       if (error) {
         throw error;
       }
       
       if (data && Array.isArray(data) && data.length > 0) {
-        setJob(data[0]);
+        setJob(data[0] as Job);
       } else {
         setJob(null);
       }
@@ -80,11 +81,11 @@ const JobDetail = () => {
     try {
       setApplyingForJob(true);
       
-      // Fix: Use correct typing for the RPC call
-      const { data, error } = await supabase.rpc<boolean, ApplyForJobParams>('apply_for_job', {
-        job_id: job.id,
-        worker_id: user.id
-      });
+      // Fix: use a more appropriate approach for RPC calls
+      const { data, error } = await supabase.rpc(
+        'apply_for_job', 
+        { job_id: job.id, worker_id: user.id }
+      );
       
       if (error) {
         throw error;
