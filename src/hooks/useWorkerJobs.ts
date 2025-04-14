@@ -20,16 +20,17 @@ export function useWorkerJobs() {
     try {
       setLoading(true);
       
-      // Use `any` type to bypass TypeScript's strict checking for RPC calls
-      const { data, error } = await (supabase.rpc as any)('get_new_jobs');
+      // Type safely call the RPC function with proper return type
+      const { data, error } = await supabase
+        .rpc('get_new_jobs')
+        .returns<Job[]>();
       
       if (error) {
         throw error;
       }
       
       if (data) {
-        // Type assertion after we've received the data
-        setJobs(data as Job[]);
+        setJobs(data);
       } else {
         setJobs([]);
       }

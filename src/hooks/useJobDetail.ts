@@ -35,16 +35,18 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setLoading(true);
       
-      // Use `any` type to bypass TypeScript's strict checking for RPC calls
-      const { data, error } = await (supabase.rpc as any)('get_job_by_id', { job_id: id });
+      // Type safely call the RPC function with proper parameter typing
+      const { data, error } = await supabase
+        .rpc('get_job_by_id', { job_id: id } as GetJobByIdParams)
+        .returns<Job[]>();
       
       if (error) {
         throw error;
       }
       
-      // Explicitly check the data structure
+      // Safely check the data structure
       if (data && Array.isArray(data) && data.length > 0) {
-        setJob(data[0] as Job);
+        setJob(data[0]);
       } else {
         setJob(null);
       }
@@ -66,14 +68,13 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setApplyingForJob(true);
       
-      // Use `any` type to bypass TypeScript's strict checking for RPC calls
-      const { data, error } = await (supabase.rpc as any)(
-        'apply_for_job', 
-        { 
-          job_id: job.id, 
-          worker_id: userId 
-        }
-      );
+      // Type safely call the RPC function with proper parameter typing
+      const { data, error } = await supabase
+        .rpc('apply_for_job', {
+          job_id: job.id,
+          worker_id: userId
+        } as ApplyForJobParams)
+        .returns<boolean>();
       
       if (error) {
         throw error;
