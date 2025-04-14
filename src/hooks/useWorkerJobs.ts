@@ -20,7 +20,7 @@ export function useWorkerJobs() {
     try {
       setLoading(true);
       
-      // Type safely call the RPC function with proper return type
+      // Call RPC function without type constraints initially
       const { data, error } = await supabase
         .rpc('get_new_jobs')
         .returns<Job[]>();
