@@ -75,20 +75,9 @@ export function LoginForm() {
   const handleSocialLogin = async (provider: 'google' | 'github' | 'facebook') => {
     setIsLoading(true);
     try {
-      const success = await socialLogin(provider);
-      if (success) {
-        toast({
-          title: 'Login successful!',
-          description: `You've logged in with ${provider}`,
-        });
-        navigate('/properties');
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Login failed',
-          description: 'An error occurred during social login',
-        });
-      }
+      await socialLogin(provider);
+      // The redirect will happen automatically from the socialLogin function
+      // We don't need to navigate here as the page will reload
     } catch (error) {
       console.error(`${provider} login error:`, error);
       toast({
@@ -96,7 +85,6 @@ export function LoginForm() {
         title: 'Login failed',
         description: 'An error occurred during social login',
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -191,4 +179,3 @@ export function LoginForm() {
       </div>
     </div>
   );
-}

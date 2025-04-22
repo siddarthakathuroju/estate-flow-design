@@ -1,19 +1,41 @@
 
-import { useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { RegisterForm } from '@/components/auth/RegisterForm';
 import { ManagerRegisterForm } from '@/components/auth/ManagerRegisterForm';
 import { WorkerRegisterForm } from '@/components/auth/WorkerRegisterForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Wallet } from 'lucide-react';
 import WalletConnect from '@/components/WalletConnect';
 import { useAuth } from '@/context/AuthContext';
+import { handleAuthRedirect } from '@/services/authService';
+import { Loader2 } from 'lucide-react';
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState('login');
+  const [processingOAuth, setProcessingOAuth] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if this is a redirect from OAuth
+    const checkForOAuthRedirect = async () => {
+      const hasHashParams = window.location.hash && window.location.hash.length > 1;
+      
+      if (hasHashParams) {
+        setProcessingOAuth(true);
+        const userObj = await handleAuthRedirect();
+        setProcessingOAuth(false);
+        
+        if (userObj) {
+          navigate('/properties');
+        }
+      }
+    };
+    
+    checkForOAuthRedirect();
+  }, [navigate]);
 
   // Redirect authenticated users
   if (isAuthenticated) {
@@ -23,6 +45,16 @@ const Auth = () => {
     } else {
       return <Navigate to="/properties" replace />;
     }
+  }
+
+  // Show loading state while processing OAuth redirect
+  if (processingOAuth) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-estate-600" />
+        <p className="mt-4 text-lg">Completing login, please wait...</p>
+      </div>
+    );
   }
 
   return (

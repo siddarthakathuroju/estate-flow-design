@@ -140,28 +140,84 @@ export const loginWithEmail = async (email: string, password: string): Promise<U
   }
 };
 
-// Mock social login
-export const loginWithSocial = (provider: 'google' | 'github' | 'facebook'): User | null => {
-  // In a real app, this would redirect to OAuth flow
-  // For demo purposes, create a mock user
-  const mockEmail = `user_${provider}_${Date.now()}@example.com`;
-  const mockUser = {
-    id: crypto.randomUUID(),
-    email: mockEmail,
-    name: `${provider.charAt(0).toUpperCase() + provider.slice(1)} User`,
-    avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${mockEmail}`,
-    role: 'client' as UserRole,
-  };
-  
-  // Save to localStorage
-  saveCurrentUser(mockUser);
-  
-  toast({
-    title: "Login successful",
-    description: `Logged in with ${provider}`,
-  });
-  
-  return mockUser;
+// Social login - properly implemented with Supabase OAuth
+export const loginWithSocial = async (provider: 'google' | 'github' | 'facebook'): Promise<User | null> => {
+  try {
+    // Initiate OAuth flow with Supabase
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth`
+      }
+    });
+
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Social login failed",
+        description: error.message,
+      });
+      return null;
+    }
+    
+    // The actual user data will be handled when the redirect happens
+    // This function just initiates the redirect
+    return null;
+  } catch (error: any) {
+    toast({
+      variant: "destructive",
+      title: "Social login failed",
+      description: error.message || `An error occurred during ${provider} login`,
+    });
+    return null;
+  }
+};
+
+// Handle OAuth results after redirect
+export const handleAuthRedirect = async (): Promise<User | null> => {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error('Error getting session:', error);
+      return null;
+    }
+    
+    if (!data.session?.user) {
+      return null;
+    }
+    
+    const user = data.session.user;
+    
+    // Fetch user profile
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    
+    // Create user object
+    const userObj: User = {
+      id: user.id,
+      email: user.email || '',
+      name: profile?.name || user.user_metadata?.name || user.email?.split('@')[0] || '',
+      role: profile?.role as UserRole,
+      avatar_url: profile?.avatar_url || user.user_metadata?.avatar_url,
+    };
+    
+    // Save to localStorage
+    saveCurrentUser(userObj);
+    
+    toast({
+      title: "Login successful",
+      description: "You have been logged in with social account",
+    });
+    
+    return userObj;
+  } catch (error: any) {
+    console.error('Error handling auth redirect:', error);
+    return null;
+  }
 };
 
 // Save current user to localStorage

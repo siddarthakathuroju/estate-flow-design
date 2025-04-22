@@ -5,6 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Job } from '@/types/jobs';
 
+// Create an interface for the RPC parameters (empty in this case)
+interface GetNewJobsParams {}
+
 export function useWorkerJobs() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -20,9 +23,9 @@ export function useWorkerJobs() {
     try {
       setLoading(true);
       
-      // Call RPC function without type constraints initially
+      // Call RPC function with proper type constraints
       const { data, error } = await supabase
-        .rpc('get_new_jobs')
+        .rpc<Job[], GetNewJobsParams>('get_new_jobs')
         .returns<Job[]>();
       
       if (error) {

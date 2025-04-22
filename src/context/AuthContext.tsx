@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { loginWithEmail, loginWithSocial } from '@/services/authService';
 import { Tables } from '@/integrations/supabase/types';
 
 // Type for user roles
@@ -52,8 +53,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
-        await fetchUserProfile(session.user.id);
-        setIsAuthenticated(true);
+        // Use setTimeout to prevent potential deadlocks with Supabase client
+        setTimeout(async () => {
+          await fetchUserProfile(session.user.id);
+          setIsAuthenticated(true);
+        }, 0);
       } else {
         setUser(null);
         setIsAuthenticated(false);
@@ -102,18 +106,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        console.error('Login error:', error.message);
-        return false;
-      }
-
-      if (data.user) {
-        await fetchUserProfile(data.user.id);
+      const user = await loginWithEmail(email, password);
+      if (user) {
+        setUser({
+          id: user.id,
+          email: user.email,
+          name: user.name || user.email.split('@')[0],
+          role: user.role || 'client' as UserRole,
+          avatar_url: user.avatar_url
+        });
         setIsAuthenticated(true);
         return true;
       }
-
       return false;
     } catch (error) {
       console.error('Login failed:', error);
@@ -125,8 +129,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const socialLogin = async (provider: 'google' | 'github' | 'facebook'): Promise<boolean> => {
     try {
-      // For demo purposes only - in a real app this would use the actual OAuth flow
-      console.log(`Social login with ${provider} would happen here`);
+      await loginWithSocial(provider);
+      // The actual auth state changes will be caught by the onAuthStateChange listener
       return true;
     } catch (error) {
       console.error(`${provider} login error:`, error);

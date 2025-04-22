@@ -5,6 +5,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Job } from '@/types/jobs';
 
+// Create an interface for the RPC parameter
+interface GetJobByIdParams {
+  job_id: string;
+}
+
+// Create an interface for the RPC parameter for applying to a job
+interface ApplyForJobParams {
+  job_id: string;
+  worker_id: string;
+}
+
 export function useJobDetail(id: string | undefined, userId: string | undefined) {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -25,9 +36,8 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setLoading(true);
       
-      // Call RPC function without type constraints initially
       const { data, error } = await supabase
-        .rpc('get_job_by_id', { job_id: id })
+        .rpc<Job[], GetJobByIdParams>('get_job_by_id', { job_id: id })
         .returns<Job[]>();
       
       if (error) {
@@ -58,9 +68,8 @@ export function useJobDetail(id: string | undefined, userId: string | undefined)
     try {
       setApplyingForJob(true);
       
-      // Call RPC function without type constraints initially
       const { data, error } = await supabase
-        .rpc('apply_for_job', {
+        .rpc<boolean, ApplyForJobParams>('apply_for_job', {
           job_id: job.id,
           worker_id: userId
         })
