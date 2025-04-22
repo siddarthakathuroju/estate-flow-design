@@ -75,16 +75,29 @@ export function LoginForm() {
   const handleSocialLogin = async (provider: 'google' | 'github' | 'facebook') => {
     setIsLoading(true);
     try {
+      // Attempt social login
       await socialLogin(provider);
       // The redirect will happen automatically from the socialLogin function
       // We don't need to navigate here as the page will reload
-    } catch (error) {
+    } catch (error: any) {
       console.error(`${provider} login error:`, error);
-      toast({
-        variant: 'destructive',
-        title: 'Login failed',
-        description: 'An error occurred during social login',
-      });
+      
+      // Show a more specific message if the provider is not configured
+      if (error?.message?.includes('provider is not enabled') || 
+          error?.error_code === 'validation_failed') {
+        toast({
+          variant: 'destructive',
+          title: `${provider.charAt(0).toUpperCase() + provider.slice(1)} login not available`,
+          description: `Please configure ${provider} authentication in your Supabase project settings.`,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Login failed',
+          description: 'An error occurred during social login. Please try again later.',
+        });
+      }
+    } finally {
       setIsLoading(false);
     }
   };
