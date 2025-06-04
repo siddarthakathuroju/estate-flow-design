@@ -48,27 +48,36 @@ export function LoginForm() {
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     setSocialLoginError(null);
+    
+    console.log('Login attempt with:', { email: data.email });
+    
     try {
       const success = await login(data.email, data.password);
+      console.log('Login result:', success);
+      
       if (success) {
         toast({
           title: 'Login successful!',
           description: 'Welcome back to NFT Property',
         });
-        navigate('/properties');
+        // Small delay to ensure auth state is updated
+        setTimeout(() => {
+          navigate('/properties');
+        }, 100);
       } else {
+        console.error('Login failed: success was false');
         toast({
           variant: 'destructive',
           title: 'Login failed',
-          description: 'Please check your credentials and try again',
+          description: 'Invalid email or password. Please check your credentials and try again.',
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       toast({
         variant: 'destructive',
         title: 'Login failed',
-        description: 'Please check your credentials and try again',
+        description: error?.message || 'An unexpected error occurred. Please try again.',
       });
     } finally {
       setIsLoading(false);
