@@ -10,13 +10,12 @@ export const [metaMaskConnector, metaMaskHooks] = initializeConnector<MetaMask>(
   new MetaMask({ actions })
 );
 
-// Initialize Coinbase Wallet connector with simplified configuration
+// Initialize Coinbase Wallet connector with minimal configuration to avoid errors
 export const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWallet>((actions) => 
   new CoinbaseWallet({
     actions,
     options: {
       appName: 'NFT Property Exchange',
-      // Remove the custom URL that was causing issues
     }
   })
 );
