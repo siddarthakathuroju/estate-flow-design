@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { useToast } from '@/components/ui/use-toast';
-import { metaMaskConnector, coinbaseConnector } from '@/lib/wallet-connectors';
+import { metaMaskConnector } from '@/lib/wallet-connectors';
 
 export function useWalletConnection() {
   const { account, isActive, connector, provider } = useWeb3React();
@@ -11,7 +11,7 @@ export function useWalletConnection() {
   const [copied, setCopied] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [pendingWallet, setPendingWallet] = useState<'metamask' | 'coinbase' | null>(null);
+  const [pendingWallet, setPendingWallet] = useState<'metamask' | null>(null);
   const { toast } = useToast();
 
   // Connect to MetaMask
@@ -65,44 +65,14 @@ export function useWalletConnection() {
     }
   };
 
-  // Connect to Coinbase Wallet
+  // Placeholder for Coinbase Wallet - we'll add this back later
   const connectCoinbaseWallet = async () => {
-    if (connector !== coinbaseConnector) {
-      try {
-        setConnectionError(null);
-        setIsConnecting(true);
-        setPendingWallet('coinbase');
-        
-        // Activate Coinbase wallet connector
-        await coinbaseConnector.activate();
-        
-        toast({
-          title: "Wallet Connected",
-          description: "Successfully connected to Coinbase Wallet",
-        });
-      } catch (error) {
-        console.error("Coinbase Wallet connection error:", error);
-        
-        // Check if error is due to user rejection
-        let errorMessage = "Failed to connect to Coinbase Wallet.";
-        
-        if (error instanceof Error) {
-          if (error.message.includes("User denied")) {
-            errorMessage = "You declined the connection request in Coinbase Wallet.";
-          }
-        }
-        
-        setConnectionError(errorMessage);
-        toast({
-          variant: "destructive",
-          title: "Connection Failed",
-          description: errorMessage,
-        });
-      } finally {
-        setIsConnecting(false);
-        setPendingWallet(null);
-      }
-    }
+    setConnectionError("Coinbase Wallet support coming soon!");
+    toast({
+      variant: "destructive",
+      title: "Not Available",
+      description: "Coinbase Wallet support is coming soon. Please use MetaMask for now.",
+    });
   };
 
   // Disconnect wallet
