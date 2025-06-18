@@ -1,6 +1,5 @@
 
 import { MetaMask } from '@web3-react/metamask';
-import { CoinbaseWallet } from '@web3-react/coinbase-wallet';
 import { initializeConnector } from '@web3-react/core';
 import type { Connector } from '@web3-react/types';
 import type { Web3ReactHooks } from '@web3-react/core';
@@ -10,18 +9,8 @@ export const [metaMaskConnector, metaMaskHooks] = initializeConnector<MetaMask>(
   new MetaMask({ actions })
 );
 
-// Initialize Coinbase Wallet connector with minimal configuration to avoid errors
-export const [coinbaseConnector, coinbaseHooks] = initializeConnector<CoinbaseWallet>((actions) => 
-  new CoinbaseWallet({
-    actions,
-    options: {
-      appName: 'NFT Property Exchange',
-    }
-  })
-);
-
-// Create the connectors array in the correct format for Web3ReactProvider
+// For now, let's just export MetaMask to avoid Coinbase Wallet SDK issues
+// We can add other connectors later once the main app is working
 export const connectors: [Connector, Web3ReactHooks][] = [
-  [metaMaskConnector, metaMaskHooks],
-  [coinbaseConnector, coinbaseHooks]
+  [metaMaskConnector, metaMaskHooks]
 ];
