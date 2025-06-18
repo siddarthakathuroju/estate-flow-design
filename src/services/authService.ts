@@ -1,8 +1,6 @@
 
-import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { UserRole } from "@/context/AuthContext";
-import { Tables } from "@/integrations/supabase/types";
 
 // Define the User type with proper structure
 export interface User {
@@ -23,6 +21,8 @@ export const getCurrentUser = (): User | null => {
 // Register a new user
 export const registerUser = async (email: string, password: string, name?: string, role: UserRole = 'client'): Promise<User | null> => {
   try {
+    console.log('Registering user:', { email, name, role });
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -35,21 +35,12 @@ export const registerUser = async (email: string, password: string, name?: strin
     });
 
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Registration failed",
-        description: error.message,
-      });
-      return null;
+      console.error('Registration error:', error);
+      throw error;
     }
 
     if (!data.user) {
-      toast({
-        variant: "destructive",
-        title: "Registration failed",
-        description: "Could not create user",
-      });
-      return null;
+      throw new Error('Could not create user');
     }
 
     // Return user without password
@@ -60,50 +51,34 @@ export const registerUser = async (email: string, password: string, name?: strin
       role,
     };
 
-    // Save to localStorage
-    saveCurrentUser(newUser);
-    
-    toast({
-      title: "Registration successful",
-      description: "Your account has been created",
-    });
-    
+    console.log('Registration successful:', newUser);
     return newUser;
   } catch (error: any) {
-    toast({
-      variant: "destructive",
-      title: "Registration failed",
-      description: error.message || "An error occurred during registration",
-    });
-    return null;
+    console.error('Registration failed:', error);
+    throw error;
   }
 };
 
 // Login with email/password
 export const loginWithEmail = async (email: string, password: string): Promise<User | null> => {
   try {
+    console.log('Attempting login with email:', email);
+    
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: error.message,
-      });
-      return null;
+      console.error('Login error:', error);
+      throw error;
     }
 
     if (!data.user) {
-      toast({
-        variant: "destructive",
-        title: "Login failed",
-        description: "Invalid email or password",
-      });
-      return null;
+      throw new Error('Invalid email or password');
     }
+
+    console.log('Login successful for user:', data.user.id);
 
     // Fetch user profile from profiles table
     const { data: profile } = await supabase
@@ -117,60 +92,21 @@ export const loginWithEmail = async (email: string, password: string): Promise<U
       id: data.user.id,
       email: data.user.email || email,
       name: profile?.name || data.user.email?.split('@')[0] || '',
-      role: profile?.role as UserRole,
+      role: (profile?.role as UserRole) || 'client',
       avatar_url: profile?.avatar_url,
     };
 
-    // Save to localStorage
-    saveCurrentUser(user);
-    
-    toast({
-      title: "Login successful",
-      description: "You have been logged in",
-    });
-    
+    console.log('User profile loaded:', user);
     return user;
   } catch (error: any) {
-    toast({
-      variant: "destructive",
-      title: "Login failed",
-      description: error.message || "An error occurred during login",
-    });
-    return null;
+    console.error('Login failed:', error);
+    throw error;
   }
 };
 
-// Social login - properly implemented with Supabase OAuth
+// Social login - removed for now since providers are not configured
 export const loginWithSocial = async (provider: 'google' | 'github' | 'facebook'): Promise<User | null> => {
-  try {
-    // Initiate OAuth flow with Supabase
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: `${window.location.origin}/auth`
-      }
-    });
-
-    if (error) {
-      toast({
-        variant: "destructive",
-        title: "Social login failed",
-        description: error.message,
-      });
-      return null;
-    }
-    
-    // The actual user data will be handled when the redirect happens
-    // This function just initiates the redirect
-    return null;
-  } catch (error: any) {
-    toast({
-      variant: "destructive",
-      title: "Social login failed",
-      description: error.message || `An error occurred during ${provider} login`,
-    });
-    return null;
-  }
+  throw new Error(`${provider} login is not configured in this environment`);
 };
 
 // Handle OAuth results after redirect
@@ -201,18 +137,11 @@ export const handleAuthRedirect = async (): Promise<User | null> => {
       id: user.id,
       email: user.email || '',
       name: profile?.name || user.user_metadata?.name || user.email?.split('@')[0] || '',
-      role: profile?.role as UserRole,
+      role: (profile?.role as UserRole) || 'client',
       avatar_url: profile?.avatar_url || user.user_metadata?.avatar_url,
     };
     
-    // Save to localStorage
-    saveCurrentUser(userObj);
-    
-    toast({
-      title: "Login successful",
-      description: "You have been logged in with social account",
-    });
-    
+    console.log('OAuth redirect user loaded:', userObj);
     return userObj;
   } catch (error: any) {
     console.error('Error handling auth redirect:', error);
@@ -220,33 +149,15 @@ export const handleAuthRedirect = async (): Promise<User | null> => {
   }
 };
 
-// Save current user to localStorage
-const saveCurrentUser = (user: User | null) => {
-  if (user) {
-    // Remove password before saving to current user
-    const { password, ...userWithoutPassword } = user;
-    localStorage.setItem('nft_property_current_user', JSON.stringify(userWithoutPassword));
-  } else {
-    localStorage.removeItem('nft_property_current_user');
-  }
-};
-
 // Logout
 export const logout = async () => {
   try {
     await supabase.auth.signOut();
-    saveCurrentUser(null);
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully",
-    });
+    localStorage.removeItem('nft_property_current_user');
+    console.log('Logout successful');
   } catch (error: any) {
     console.error("Logout error:", error);
-    toast({
-      variant: "destructive",
-      title: "Logout failed",
-      description: error.message || "An error occurred during logout",
-    });
+    throw error;
   }
 };
 

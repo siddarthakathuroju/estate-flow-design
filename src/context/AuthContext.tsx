@@ -1,8 +1,9 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { loginWithEmail, loginWithSocial } from '@/services/authService';
-import { Tables } from '@/integrations/supabase/types';
+import { useToast } from '@/hooks/use-toast';
 
 // Type for user roles
 export type UserRole = 'client' | 'manager' | 'worker';
@@ -15,7 +16,6 @@ interface UserProfile {
   avatar_url?: string;
   created_at?: string;
   updated_at?: string;
-  // Add other profile fields here
 }
 
 interface AuthContextType {
@@ -47,6 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     // Set up auth state change listener
@@ -58,13 +59,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTimeout(async () => {
           await fetchUserProfile(session.user.id);
           setIsAuthenticated(true);
+          setLoading(false);
         }, 0);
       } else {
         console.log('No session, clearing user state');
         setUser(null);
         setIsAuthenticated(false);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     // Check for existing session
@@ -122,21 +124,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log('Login service response:', user);
       
       if (user) {
-        setUser({
-          id: user.id,
-          email: user.email,
-          name: user.name || user.email.split('@')[0],
-          role: user.role || 'client' as UserRole,
-          avatar_url: user.avatar_url
-        });
-        setIsAuthenticated(true);
-        console.log('Login successful, user set');
+        // The auth state change listener will handle setting the user
+        console.log('Login successful');
         return true;
       }
       console.log('Login failed, no user returned');
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login failed with error:', error);
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: error.message || "Invalid email or password",
+      });
       return false;
     } finally {
       setLoading(false);
@@ -146,10 +146,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const socialLogin = async (provider: 'google' | 'github' | 'facebook'): Promise<boolean> => {
     try {
       await loginWithSocial(provider);
-      // The actual auth state changes will be caught by the onAuthStateChange listener
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`${provider} login error:`, error);
+      toast({
+        variant: "destructive",
+        title: "Social login not available",
+        description: "Social login providers are not configured.",
+      });
       return false;
     }
   };
@@ -170,6 +174,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Registration error:', error.message);
+        toast({
+          variant: "destructive",
+          title: "Registration failed",
+          description: error.message,
+        });
         return false;
       }
 
@@ -186,19 +195,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (profileError) {
           console.error('Error creating profile:', profileError.message);
-          // Optionally, delete the user if profile creation fails
-          await supabase.auth.signOut();
+          toast({
+            variant: "destructive",
+            title: "Registration failed",
+            description: "Failed to create user profile",
+          });
           return false;
         }
 
-        await fetchUserProfile(data.user.id);
-        setIsAuthenticated(true);
+        toast({
+          title: "Registration successful",
+          description: "Please check your email to verify your account",
+        });
         return true;
       }
 
       return false;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Registration failed:', error);
+      toast({
+        variant: "destructive",
+        title: "Registration failed",
+        description: error.message || "An unexpected error occurred",
+      });
       return false;
     } finally {
       setLoading(false);
@@ -215,7 +234,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setIsAuthenticated(false);
       navigate('/auth');
-    } catch (error) {
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully",
+      });
+    } catch (error: any) {
       console.error('Logout failed:', error);
     } finally {
       setLoading(false);
@@ -230,16 +253,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
-      // Ensure role is a valid enum value if it's being updated
-      const updateData = { ...data };
-      if (updateData.role && !['client', 'manager', 'worker'].includes(updateData.role)) {
-        console.error('Invalid role specified');
-        return false;
-      }
-
       const { error } = await supabase
         .from('profiles')
-        .update(updateData)
+        .update(data)
         .eq('id', user.id);
 
       if (error) {
@@ -250,7 +266,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Fetch the updated profile
       await fetchUserProfile(user.id);
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Profile update failed:', error);
       return false;
     } finally {

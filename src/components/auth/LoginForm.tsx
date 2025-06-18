@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { Facebook, Github, Mail, LogIn } from 'lucide-react';
+import { Mail, LogIn } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle } from 'lucide-react';
 
@@ -29,11 +29,11 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export function LoginForm() {
-  const { login, socialLogin } = useAuth();
+  const { login } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [socialLoginError, setSocialLoginError] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   // Initialize form
   const form = useForm<FormValues>({
@@ -47,7 +47,7 @@ export function LoginForm() {
   // Handle form submission
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
-    setSocialLoginError(null);
+    setLoginError(null);
     
     console.log('Login attempt with:', { email: data.email });
     
@@ -66,49 +66,12 @@ export function LoginForm() {
         }, 100);
       } else {
         console.error('Login failed: success was false');
-        toast({
-          variant: 'destructive',
-          title: 'Login failed',
-          description: 'Invalid email or password. Please check your credentials and try again.',
-        });
+        setLoginError('Invalid email or password. Please check your credentials and try again.');
       }
     } catch (error: any) {
       console.error('Login error:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Login failed',
-        description: error?.message || 'An unexpected error occurred. Please try again.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Handle social login
-  const handleSocialLogin = async (provider: 'google' | 'github' | 'facebook') => {
-    setIsLoading(true);
-    setSocialLoginError(null);
-    try {
-      // Attempt social login
-      await socialLogin(provider);
-      // The redirect will happen automatically from the socialLogin function
-      // We don't need to navigate here as the page will reload
-    } catch (error: any) {
-      console.error(`${provider} login error:`, error);
-      
-      // Show a more specific message if the provider is not configured
-      if (error?.message?.includes('provider is not enabled') || 
-          error?.error_code === 'validation_failed') {
-        setSocialLoginError(
-          `${provider.charAt(0).toUpperCase() + provider.slice(1)} login is not configured. Please set up the ${provider} provider in your Supabase project settings.`
-        );
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Login failed',
-          description: 'An error occurred during social login. Please try again later.',
-        });
-      }
+      const errorMessage = error?.message || 'An unexpected error occurred. Please try again.';
+      setLoginError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -121,10 +84,10 @@ export function LoginForm() {
         <p className="text-muted-foreground">Enter your credentials to sign in to your account</p>
       </div>
       
-      {socialLoginError && (
+      {loginError && (
         <Alert variant="destructive" className="mb-4">
-          <AlertTriangle className="h-4 w-4 mr-2" />
-          <AlertDescription>{socialLoginError}</AlertDescription>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{loginError}</AlertDescription>
         </Alert>
       )}
       
@@ -177,36 +140,21 @@ export function LoginForm() {
         </div>
       </div>
       
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3">
         <Button 
           variant="outline" 
           type="button" 
           disabled={isLoading}
-          onClick={() => handleSocialLogin('google')}
+          onClick={() => {
+            toast({
+              variant: "destructive",
+              title: "Social Login Not Available",
+              description: "Social login providers are not configured. Please use email/password login.",
+            });
+          }}
         >
-          <svg
-            className="h-4 w-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 488 512"
-          >
-            <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
-          </svg>
-        </Button>
-        <Button 
-          variant="outline" 
-          type="button" 
-          disabled={isLoading}
-          onClick={() => handleSocialLogin('github')}
-        >
-          <Github className="h-4 w-4" />
-        </Button>
-        <Button 
-          variant="outline" 
-          type="button" 
-          disabled={isLoading}
-          onClick={() => handleSocialLogin('facebook')}
-        >
-          <Facebook className="h-4 w-4" />
+          <Mail className="h-4 w-4 mr-2" />
+          Email Login Only
         </Button>
       </div>
     </div>
