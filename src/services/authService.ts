@@ -27,6 +27,7 @@ export const registerUser = async (email: string, password: string, name?: strin
       email,
       password,
       options: {
+        emailRedirectTo: `${window.location.origin}/auth`,
         data: {
           name,
           role,
@@ -104,9 +105,33 @@ export const loginWithEmail = async (email: string, password: string): Promise<U
   }
 };
 
-// Social login - removed for now since providers are not configured
+// Social login with proper OAuth flow
 export const loginWithSocial = async (provider: 'google' | 'github' | 'facebook'): Promise<User | null> => {
-  throw new Error(`${provider} login is not configured in this environment`);
+  try {
+    console.log(`Attempting ${provider} login`);
+    
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth`,
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      },
+    });
+
+    if (error) {
+      console.error(`${provider} login error:`, error);
+      throw error;
+    }
+
+    console.log(`${provider} login initiated successfully`);
+    return null; // OAuth redirects, so we return null here
+  } catch (error: any) {
+    console.error(`${provider} login failed:`, error);
+    throw error;
+  }
 };
 
 // Handle OAuth results after redirect
