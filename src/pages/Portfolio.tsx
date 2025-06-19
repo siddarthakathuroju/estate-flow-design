@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AreaChart, Wallet, TrendingUp, TrendingDown, DollarSign, BarChart3, History } from 'lucide-react';
+import { AreaChart, Wallet, TrendingUp, TrendingDown, DollarSign, BarChart3, History, ArrowLeft } from 'lucide-react';
 import {
   Card,
   CardContent,
@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { calculatePortfolioSummary, getPropertyPerformance, getPortfolioChartData } from "@/services/portfolioService";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
@@ -96,6 +97,15 @@ export default function Portfolio() {
       />
       
       <div className="container mx-auto px-4 md:px-6 py-8 max-w-7xl -mt-20 relative z-10">
+        {/* Back Button */}
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/properties')}
+          className="mb-6 flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to Properties
+        </Button>
+
         <div className="grid gap-6">
           {/* Wallet Information Card */}
           {isActive && account && (
@@ -145,24 +155,34 @@ export default function Portfolio() {
             />
           )}
           
-          {/* Portfolio Tabs - Property Performance and Transaction History */}
+          {/* Enhanced Transaction History */}
+          <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg md:text-xl flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Complete Transaction History
+              </CardTitle>
+              <CardDescription>Detailed view of all your buy and sell activities</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TransactionHistory />
+            </CardContent>
+          </Card>
+          
+          {/* Portfolio Tabs - Property Performance */}
           <Tabs defaultValue="properties" className="w-full">
-            <TabsList className="mb-5 grid grid-cols-2 w-full max-w-md mx-auto">
+            <TabsList className="mb-5 grid grid-cols-1 w-full max-w-md mx-auto">
               <TabsTrigger value="properties" className="flex items-center gap-2">
                 <AreaChart className="h-4 w-4" />
-                <span>Property Performance</span>
-              </TabsTrigger>
-              <TabsTrigger value="transactions" className="flex items-center gap-2">
-                <History className="h-4 w-4" />
-                <span>Transaction History</span>
+                <span>Property Performance Analysis</span>
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="properties" className="mt-0">
               <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg md:text-xl">Property Performance</CardTitle>
-                  <CardDescription>Track the profit and loss for each property</CardDescription>
+                  <CardTitle className="text-lg md:text-xl">Property Performance Breakdown</CardTitle>
+                  <CardDescription>Individual property profit and loss analysis</CardDescription>
                 </CardHeader>
                 <CardContent>
                   {propertyPerformance.length === 0 ? (
@@ -172,6 +192,12 @@ export default function Portfolio() {
                       <p className="max-w-sm mx-auto mt-2">
                         Start buying properties to see their performance in your portfolio.
                       </p>
+                      <Button 
+                        onClick={() => navigate('/properties')}
+                        className="mt-4"
+                      >
+                        Browse Properties
+                      </Button>
                     </div>
                   ) : (
                     <div className="rounded-md border overflow-hidden">
@@ -183,6 +209,7 @@ export default function Portfolio() {
                             <TableHead>Current Value</TableHead>
                             <TableHead>Profit/Loss</TableHead>
                             <TableHead>Performance</TableHead>
+                            <TableHead>ROI</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -206,7 +233,9 @@ export default function Portfolio() {
                               </TableCell>
                               <TableCell>{formatCurrency(property.invested)}</TableCell>
                               <TableCell>{formatCurrency(property.currentValue)}</TableCell>
-                              <TableCell>{formatCurrency(property.profit)}</TableCell>
+                              <TableCell className={property.profit >= 0 ? 'text-green-600' : 'text-red-600'}>
+                                {formatCurrency(property.profit)}
+                              </TableCell>
                               <TableCell>
                                 <div className="flex items-center gap-2">
                                   {property.profit >= 0 ? (
@@ -219,6 +248,11 @@ export default function Portfolio() {
                                   </Badge>
                                 </div>
                               </TableCell>
+                              <TableCell>
+                                <span className={`font-medium ${property.profitPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                  {property.profitPercentage >= 0 ? '+' : ''}{formatPercentage(property.profitPercentage)}
+                                </span>
+                              </TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -227,10 +261,6 @@ export default function Portfolio() {
                   )}
                 </CardContent>
               </Card>
-            </TabsContent>
-            
-            <TabsContent value="transactions" className="mt-0">
-              <TransactionHistory />
             </TabsContent>
           </Tabs>
         </div>

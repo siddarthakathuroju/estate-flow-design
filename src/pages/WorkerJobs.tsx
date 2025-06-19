@@ -38,17 +38,17 @@ const WorkerJobs = () => {
       <div className="flex-1 container pt-24 pb-12">
         <Button 
           variant="outline" 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/properties')}
           className="mb-6 flex items-center gap-2"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Home
+          <ArrowLeft className="h-4 w-4" /> Back to Properties
         </Button>
         
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold">New Jobs</h1>
+            <h1 className="text-3xl font-bold">Available Jobs</h1>
             <p className="text-muted-foreground mt-1">
-              Available jobs you can apply for
+              Browse and apply for available job opportunities
             </p>
           </div>
         </div>
@@ -62,7 +62,7 @@ const WorkerJobs = () => {
                 <TableHead>Job Title</TableHead>
                 <TableHead>Job Pay</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>View</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -97,7 +97,7 @@ const WorkerJobs = () => {
                         onClick={() => navigate(`/jobs/${job.id}`)}
                         className="flex items-center gap-1"
                       >
-                        <Eye className="h-4 w-4" /> View
+                        <Eye className="h-4 w-4" /> View Details
                       </Button>
                     </TableCell>
                   </TableRow>
