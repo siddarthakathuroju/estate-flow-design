@@ -1,184 +1,163 @@
 
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useTheme } from 'next-themes';
-import { useAuth } from '@/context/AuthContext';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, User, LogOut, Settings, BarChart3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import { Button } from "@/components/ui/button"
-import { Moon, Sun, Menu, Briefcase, User } from 'lucide-react';
-
-const NavbarLinks = [
-  { name: 'Home', href: '/' },
-  { name: 'Properties', href: '/properties' },
-  { name: 'About', href: '/about' },
-  { name: 'Contact', href: '/contact' },
-];
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import WalletConnect from '@/components/WalletConnect';
+import { useAuth } from '@/context/AuthContext';
 
 const Navbar = () => {
-  const { theme, setTheme } = useTheme();
-  const { pathname } = useLocation();
-  const { user, isAuthenticated, logout, isWorker, isManager } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
 
   const handleLogout = async () => {
     await logout();
-    navigate('/auth');
+    navigate('/');
   };
 
+  const navItems = [
+    { label: 'Properties', href: '/properties' },
+    { label: 'Portfolio', href: '/portfolio' }, // Added portfolio
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
+  ];
+
   return (
-    <nav className="bg-background border-b sticky top-0 z-50">
-      <div className="container flex items-center justify-between h-16">
-        {/* Logo */}
-        <Link to="/" className="flex items-center font-semibold text-2xl">
-          <span className="text-estate-600">NFT</span>
-          <span>Property</span>
-        </Link>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="text-xl font-bold text-estate-600">NFT</span>
+            <span className="text-xl font-bold text-gray-900">Property</span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center space-x-6">
-          {NavbarLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.href}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                pathname === link.href ? 'text-primary' : 'text-muted-foreground'
-              }`}
-            >
-              {link.name}
-            </Link>
-          ))}
-          {isAuthenticated && isWorker && (
-            <Link
-              to="/jobs/new"
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                pathname === '/jobs/new' ? 'text-primary' : 'text-muted-foreground'
-              }`}
-            >
-              Jobs
-            </Link>
-          )}
-
-          {/* Theme Toggle */}
-          <Button variant="ghost" size="sm" onClick={toggleTheme}>
-            {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-          </Button>
-
-          {/* Profile Section */}
-          {isAuthenticated ? (
-            <div className="flex items-center space-x-4">
-              <Link to="/profile">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.avatar_url || ""} alt={user?.name || "Profile"} />
-                  <AvatarFallback>{user?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
-                </Avatar>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="text-gray-700 hover:text-estate-600 transition-colors font-medium"
+              >
+                {item.label}
               </Link>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
-            </div>
-          ) : (
-            <Link to="/auth">
-              <Button size="sm">Sign In</Button>
-            </Link>
-          )}
+            ))}
+          </div>
+
+          {/* Right side actions */}
+          <div className="hidden md:flex items-center space-x-4">
+            <WalletConnect />
+            
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2">
+                    <User size={20} />
+                    <span>{user?.name || user?.email?.split('@')[0] || 'User'}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/portfolio')}>
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    Portfolio
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/auth">
+                <Button>Sign In</Button>
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsOpen(!isOpen)}
+            >
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            </Button>
+          </div>
         </div>
 
-        {/* Mobile Navigation */}
-        <div className="lg:hidden">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="sm" onClick={toggleMobileMenu}>
-                <Menu className="h-4 w-4" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-full sm:w-64">
-              <SheetHeader className="text-left">
-                <SheetTitle>Menu</SheetTitle>
-                <SheetDescription>
-                  Navigate through the application.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="mt-4">
-                <ul className="divide-y divide-border-muted">
-                  {NavbarLinks.map((link) => (
-                    <li key={link.name}>
-                      <Link
-                        to={link.href}
-                        className="flex items-center gap-3 p-2 text-muted-foreground"
-                        onClick={closeMobileMenu}
-                      >
-                        <span>{link.name}</span>
-                      </Link>
-                    </li>
-                  ))}
-                  {isAuthenticated && isWorker && (
-                    <li>
-                      <Link
-                        to="/jobs/new"
-                        className="flex items-center gap-3 p-2 text-muted-foreground"
-                        onClick={toggleMobileMenu}
-                      >
-                        <Briefcase className="h-5 w-5" />
-                        <span>Jobs</span>
-                      </Link>
-                    </li>
-                  )}
-                  {isAuthenticated ? (
-                    <>
-                      <li>
-                        <Link
-                          to="/profile"
-                          className="flex items-center gap-3 p-2 text-muted-foreground"
-                          onClick={toggleMobileMenu}
-                        >
-                          <User className="h-5 w-5" />
-                          <span>Profile</span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Button variant="outline" className="w-full justify-start gap-2 mt-2" size="sm" onClick={handleLogout}>
-                          <User className="h-4 w-4" />
-                          Logout
-                        </Button>
-                      </li>
-                    </>
-                  ) : (
-                    <li>
-                      <Link to="/auth" className="flex items-center gap-3 p-2 text-muted-foreground" onClick={toggleMobileMenu}>
-                        <span>Sign In</span>
-                      </Link>
-                    </li>
-                  )}
-                </ul>
-                <Button variant="ghost" size="sm" onClick={toggleTheme} className="w-full justify-start gap-2 mt-4">
-                  {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                  {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
-                </Button>
+        {/* Mobile menu */}
+        {isOpen && (
+          <div className="md:hidden border-t border-gray-200 py-4">
+            <div className="flex flex-col space-y-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="text-gray-700 hover:text-estate-600 transition-colors font-medium"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              
+              <div className="border-t pt-4">
+                <WalletConnect />
               </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+              
+              {isAuthenticated ? (
+                <div className="space-y-2">
+                  <Link
+                    to="/profile"
+                    className="block text-gray-700 hover:text-estate-600 transition-colors font-medium"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/portfolio"
+                    className="block text-gray-700 hover:text-estate-600 transition-colors font-medium"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Portfolio
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                    }}
+                    className="w-full justify-start p-0 text-gray-700 hover:text-estate-600"
+                  >
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/auth">
+                  <Button className="w-full">Sign In</Button>
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

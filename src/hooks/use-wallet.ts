@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { metaMaskConnector } from '@/lib/wallet-connectors';
 
 export function useWalletConnection() {
@@ -16,52 +16,53 @@ export function useWalletConnection() {
 
   // Connect to MetaMask
   const connectMetaMask = async () => {
-    if (connector !== metaMaskConnector) {
-      try {
-        setConnectionError(null);
-        setIsConnecting(true);
-        setPendingWallet('metamask');
-        
-        // Check if MetaMask is installed
-        const ethereum = window.ethereum;
-        if (!ethereum || !ethereum.isMetaMask) {
-          setConnectionError("MetaMask is not installed. Please install MetaMask to continue.");
-          toast({
-            variant: "destructive",
-            title: "MetaMask Not Found",
-            description: "Please install MetaMask browser extension to connect.",
-          });
-          setIsConnecting(false);
-          setPendingWallet(null);
-          return;
-        }
-        
-        await metaMaskConnector.activate();
-        
-        toast({
-          title: "Wallet Connected",
-          description: "Successfully connected to MetaMask",
-        });
-      } catch (error) {
-        console.error("MetaMask connection error:", error);
-        let errorMessage = "Failed to connect to MetaMask.";
-        
-        if (error instanceof Error) {
-          if (error.message.includes("user rejected")) {
-            errorMessage = "You rejected the connection request.";
-          }
-        }
-        
-        setConnectionError(errorMessage);
-        toast({
-          variant: "destructive",
-          title: "Connection Failed",
-          description: errorMessage,
-        });
-      } finally {
-        setIsConnecting(false);
-        setPendingWallet(null);
+    try {
+      setConnectionError(null);
+      setIsConnecting(true);
+      setPendingWallet('metamask');
+      
+      console.log('Starting MetaMask connection...');
+      
+      // Check if MetaMask is installed
+      if (typeof window.ethereum === 'undefined') {
+        throw new Error("MetaMask is not installed. Please install MetaMask to continue.");
       }
+      
+      // Check if MetaMask is the active connector
+      if (connector !== metaMaskConnector) {
+        console.log('Activating MetaMask connector...');
+        await metaMaskConnector.activate();
+      }
+      
+      console.log('MetaMask connection successful');
+      toast({
+        title: "Wallet Connected",
+        description: "Successfully connected to MetaMask",
+      });
+      
+    } catch (error: any) {
+      console.error("MetaMask connection error:", error);
+      let errorMessage = "Failed to connect to MetaMask.";
+      
+      if (error.message) {
+        if (error.message.includes("user rejected")) {
+          errorMessage = "Connection rejected by user.";
+        } else if (error.message.includes("not installed")) {
+          errorMessage = "MetaMask is not installed. Please install MetaMask browser extension.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setConnectionError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Connection Failed",
+        description: errorMessage,
+      });
+    } finally {
+      setIsConnecting(false);
+      setPendingWallet(null);
     }
   };
 
@@ -84,6 +85,8 @@ export function useWalletConnection() {
         } else {
           await connector.resetState();
         }
+        setBalance(null);
+        setConnectionError(null);
         toast({
           title: "Wallet Disconnected",
           description: "Your wallet has been disconnected",
@@ -95,15 +98,19 @@ export function useWalletConnection() {
   };
 
   // Copy address to clipboard
-  const copyAddress = () => {
+  const copyAddress = async () => {
     if (account) {
-      navigator.clipboard.writeText(account);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-      toast({
-        title: "Address Copied",
-        description: "Wallet address copied to clipboard",
-      });
+      try {
+        await navigator.clipboard.writeText(account);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+        toast({
+          title: "Address Copied",
+          description: "Wallet address copied to clipboard",
+        });
+      } catch (error) {
+        console.error("Failed to copy address:", error);
+      }
     }
   };
 
@@ -112,9 +119,11 @@ export function useWalletConnection() {
     const getBalance = async () => {
       if (isActive && account && provider) {
         try {
+          console.log('Fetching balance for account:', account);
           const balance = await provider.getBalance(account);
-          // Convert balance to string before passing to formatEther
-          setBalance(ethers.formatEther(balance.toString()));
+          const balanceInEth = ethers.formatEther(balance.toString());
+          setBalance(balanceInEth);
+          console.log('Balance fetched:', balanceInEth, 'ETH');
         } catch (error) {
           console.error("Error fetching balance:", error);
           setBalance(null);
@@ -126,6 +135,13 @@ export function useWalletConnection() {
 
     getBalance();
   }, [isActive, account, provider]);
+
+  // Clear errors when connection state changes
+  useEffect(() => {
+    if (isActive) {
+      setConnectionError(null);
+    }
+  }, [isActive]);
 
   return {
     account,
