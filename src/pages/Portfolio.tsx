@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { calculatePortfolioSummary, getPropertyPerformance, getPortfolioChartData } from "@/services/portfolioService";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
@@ -41,29 +42,97 @@ export default function Portfolio() {
   const [activeTab, setActiveTab] = useState("overview");
   const { isActive, account, balance } = useWalletConnection();
   
-  // Use useEffect for navigation to prevent the React warning
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/auth');
-    }
-  }, [isAuthenticated, navigate]);
-  
-  // If not authenticated, return a loading state instead of null
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="container py-8 max-w-6xl mt-16">
-          <div className="flex items-center justify-center h-[60vh]">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold mb-2">Loading Portfolio...</h2>
-              <p className="text-muted-foreground">Please sign in to view your portfolio</p>
-            </div>
+  // If not authenticated, show portfolio preview with login prompt
+  const renderAuthPrompt = () => (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      
+      <Hero 
+        title="Portfolio Dashboard" 
+        subtitle="Track your property investments and performance" 
+        backgroundImage="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+        className="h-[30vh] md:h-[35vh]"
+      />
+      
+      <div className="container mx-auto px-4 md:px-6 py-8 max-w-7xl -mt-20 relative z-10">
+        {/* Back Button */}
+        <Button 
+          variant="outline" 
+          onClick={() => navigate('/')}
+          className="mb-6 flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" /> Back to Home
+        </Button>
+
+        <Alert className="mb-8">
+          <BarChart3 className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>Please sign in to view your portfolio and track your investments.</span>
+            <Button onClick={() => navigate('/auth')} className="ml-4">
+              Sign In
+            </Button>
+          </AlertDescription>
+        </Alert>
+
+        {/* Demo Portfolio Preview */}
+        <div className="grid gap-6 opacity-50 pointer-events-none">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Invested</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">0.00 ETH</div>
+                <p className="text-xs text-muted-foreground">Start investing to see your portfolio</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Returns</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">0.00 ETH</div>
+                <p className="text-xs text-muted-foreground">Returns from your investments</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Properties Owned</CardTitle>
+                <AreaChart className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">0</div>
+                <p className="text-xs text-muted-foreground">Number of properties in portfolio</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total ROI</CardTitle>
+                <BarChart3 className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">0.00%</div>
+                <p className="text-xs text-muted-foreground">Return on investment</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
+      </div>
+      
+      <div className="mt-auto">
         <Footer />
       </div>
-    );
+    </div>
+  );
+
+  // Show auth prompt if not authenticated
+  if (!isAuthenticated) {
+    return renderAuthPrompt();
   }
   
   // Get portfolio data
@@ -100,10 +169,10 @@ export default function Portfolio() {
         {/* Back Button */}
         <Button 
           variant="outline" 
-          onClick={() => navigate('/properties')}
+          onClick={() => navigate('/')}
           className="mb-6 flex items-center gap-2"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Properties
+          <ArrowLeft className="h-4 w-4" /> Back to Home
         </Button>
 
         <div className="grid gap-6">

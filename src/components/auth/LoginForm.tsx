@@ -18,7 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import { LogIn, Github } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Info } from 'lucide-react';
 
 // Form validation schema
 const formSchema = z.object({
@@ -95,8 +95,8 @@ export function LoginForm() {
       console.error(`${provider} login error:`, error);
       toast({
         variant: 'destructive',
-        title: 'Social login not available',
-        description: 'Social login providers need to be configured in Supabase dashboard',
+        title: 'Social login configuration needed',
+        description: `Please configure ${provider} login in your Supabase dashboard under Authentication > Providers`,
       });
     } finally {
       setIsLoading(false);
@@ -116,6 +116,13 @@ export function LoginForm() {
           <AlertDescription>{loginError}</AlertDescription>
         </Alert>
       )}
+      
+      <Alert className="mb-4">
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Social Login Setup Required:</strong> To enable Google/GitHub login, configure OAuth providers in your Supabase dashboard under Authentication > Providers.
+        </AlertDescription>
+      </Alert>
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -222,8 +229,10 @@ export function LoginForm() {
       </div>
       
       <div className="text-center text-sm text-muted-foreground">
-        <p>Social login requires configuration in Supabase dashboard.</p>
-        <p>Please use email/password for now or contact support.</p>
+        <p><strong>To enable social login:</strong></p>
+        <p>1. Go to Supabase Dashboard → Authentication → Providers</p>
+        <p>2. Enable and configure Google/GitHub OAuth</p>
+        <p>3. Add your app's redirect URLs</p>
       </div>
     </div>
   );
