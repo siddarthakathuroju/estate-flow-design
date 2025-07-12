@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { useWalletConnection } from '@/hooks/use-wallet';
+import { useWallet } from '@/hooks/useWallet';
 import { useToast } from '@/components/ui/use-toast';
 import { addTransaction } from '@/services/transactionService';
 import WalletConnect from '@/components/WalletConnect';
@@ -39,7 +39,7 @@ const PropertyDetail = () => {
   const [walletInput, setWalletInput] = useState('');
   const [transactionType, setTransactionType] = useState<'buy' | 'sell'>('buy');
   
-  const { isActive, account, balance, connectMetaMask } = useWalletConnection();
+  const { isConnected, address, balance, connectMetaMask } = useWallet();
   const { toast } = useToast();
   
   const property = ALL_PROPERTIES.find(p => p.id === Number(id));
@@ -73,10 +73,10 @@ const PropertyDetail = () => {
   }, []);
 
   useEffect(() => {
-    if (isActive && account) {
-      setWalletInput(account);
+    if (isConnected && address) {
+      setWalletInput(address);
     }
-  }, [isActive, account]);
+  }, [isConnected, address]);
   
   // Toggle transaction type
   const toggleTransactionType = () => {
@@ -85,7 +85,7 @@ const PropertyDetail = () => {
   
   // Handle buy or sell transaction
   const handleTransaction = () => {
-    if (!isActive) {
+    if (!isConnected) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to complete this transaction",
@@ -112,7 +112,7 @@ const PropertyDetail = () => {
     
     // Add transaction to transaction history
     addTransaction({
-      userId: account,
+      userId: address,
       propertyId: propertyId.toString(),
       propertyName: property.title,
       propertyImage: propertyImage,
@@ -462,7 +462,7 @@ const PropertyDetail = () => {
                   </span>
                 </div>
                 
-                {!isActive ? (
+                {!isConnected ? (
                   <div className="space-y-4">
                     <p className="text-sm text-center text-muted-foreground mb-2">
                       Connect your wallet to {transactionType === 'buy' ? 'purchase' : 'sell'} this property

@@ -29,7 +29,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { calculatePortfolioSummary, getPropertyPerformance, getPortfolioChartData } from "@/services/portfolioService";
 import { TransactionHistory } from "@/components/profile/TransactionHistory";
-import { useWalletConnection } from '@/hooks/use-wallet';
+import { useWallet } from '@/hooks/useWallet';
 import Hero from '@/components/Hero';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -40,7 +40,7 @@ export default function Portfolio() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("overview");
-  const { isActive, account, balance } = useWalletConnection();
+  const { isConnected, address, balance } = useWallet();
   
   // If not authenticated, show portfolio preview with login prompt
   const renderAuthPrompt = () => (
@@ -177,7 +177,7 @@ export default function Portfolio() {
 
         <div className="grid gap-6">
           {/* Wallet Information Card */}
-          {isActive && account && (
+          {isConnected && address && (
             <Card className="shadow-md border border-border/50 bg-card/95 backdrop-blur mb-6">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
@@ -188,7 +188,7 @@ export default function Portfolio() {
                     <div>
                       <p className="text-sm font-medium">Connected Wallet</p>
                       <p className="text-xs text-muted-foreground">
-                        {account.substring(0, 6)}...{account.substring(account.length - 4)}
+                        {address.substring(0, 6)}...{address.substring(address.length - 4)}
                       </p>
                     </div>
                   </div>

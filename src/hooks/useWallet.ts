@@ -1,17 +1,16 @@
-
 import { useState, useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
 import { ethers } from 'ethers';
 import { useToast } from '@/hooks/use-toast';
-import { metaMaskConnector } from '@/lib/wallet-connectors';
+import { metaMaskConnector, coinbaseWalletConnector } from '@/lib/wallet-connectors';
 
-export function useWalletConnection() {
+export function useWallet() {
   const { account, isActive, connector, provider } = useWeb3React();
   const [balance, setBalance] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [pendingWallet, setPendingWallet] = useState<'metamask' | null>(null);
+  const [pendingWallet, setPendingWallet] = useState<'metamask' | 'coinbase' | null>(null);
   const { toast } = useToast();
 
   // Connect to MetaMask
@@ -28,11 +27,7 @@ export function useWalletConnection() {
         throw new Error("MetaMask is not installed. Please install MetaMask to continue.");
       }
       
-      // Check if MetaMask is the active connector
-      if (connector !== metaMaskConnector) {
-        console.log('Activating MetaMask connector...');
-        await metaMaskConnector.activate();
-      }
+      await metaMaskConnector.activate();
       
       console.log('MetaMask connection successful');
       toast({
@@ -66,18 +61,49 @@ export function useWalletConnection() {
     }
   };
 
-  // Placeholder for Coinbase Wallet - we'll add this back later
-  const connectCoinbaseWallet = async () => {
-    setConnectionError("Coinbase Wallet support coming soon!");
-    toast({
-      variant: "destructive",
-      title: "Not Available",
-      description: "Coinbase Wallet support is coming soon. Please use MetaMask for now.",
-    });
+  // Connect to Coinbase Wallet
+  const connectCoinbase = async () => {
+    try {
+      setConnectionError(null);
+      setIsConnecting(true);
+      setPendingWallet('coinbase');
+      
+      console.log('Starting Coinbase Wallet connection...');
+      
+      await coinbaseWalletConnector.activate();
+      
+      console.log('Coinbase Wallet connection successful');
+      toast({
+        title: "Wallet Connected",
+        description: "Successfully connected to Coinbase Wallet",
+      });
+      
+    } catch (error: any) {
+      console.error("Coinbase Wallet connection error:", error);
+      let errorMessage = "Failed to connect to Coinbase Wallet.";
+      
+      if (error.message) {
+        if (error.message.includes("user rejected")) {
+          errorMessage = "Connection rejected by user.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
+      setConnectionError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Connection Failed",
+        description: errorMessage,
+      });
+    } finally {
+      setIsConnecting(false);
+      setPendingWallet(null);
+    }
   };
 
   // Disconnect wallet
-  const disconnect = async () => {
+  const disconnectWallet = async () => {
     try {
       if (connector) {
         if (connector.deactivate) {
@@ -144,14 +170,22 @@ export function useWalletConnection() {
   }, [isActive]);
 
   return {
-    account,
-    isActive,
+    // Wallet connection status
+    isConnected: isActive,
+    address: account,
     balance,
-    copied,
+    provider,
+    
+    // Connection methods
     connectMetaMask,
-    connectCoinbaseWallet,
-    disconnect,
+    connectCoinbase,
+    disconnectWallet,
+    
+    // UI helpers
     copyAddress,
+    copied,
+    
+    // Loading states
     connectionError,
     isConnecting,
     pendingWallet

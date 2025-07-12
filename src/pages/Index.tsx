@@ -10,7 +10,7 @@ import { useInView } from '@/lib/animations';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { useWalletConnection } from '@/hooks/use-wallet';
+import { useWallet } from '@/hooks/useWallet';
 import PropertyCard from '@/components/PropertyCard';
 import { ERC_STANDARDS } from '@/lib/erc-standards';
 import {
@@ -58,7 +58,7 @@ const Index = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   
   // Wallet state
-  const { isActive: isWalletConnected, connectMetaMask } = useWalletConnection();
+  const { isConnected: isWalletConnected, connectMetaMask } = useWallet();
 
   useEffect(() => {
     // Simulate content loading

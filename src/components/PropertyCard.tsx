@@ -5,7 +5,7 @@ import { Bath, BedDouble, Square, Heart, Tag, Clock, Wallet, Bitcoin, CircleDoll
 import { cn } from '@/lib/utils';
 import { formatPrice } from '@/lib/animations';
 import { Button } from '@/components/ui/button';
-import { useWalletConnection } from '@/hooks/use-wallet';
+import { useWallet } from '@/hooks/useWallet';
 import { useToast } from '@/components/ui/use-toast';
 import { addTransaction } from '@/services/transactionService';
 
@@ -37,7 +37,7 @@ const PropertyCard = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [transactionType, setTransactionType] = useState<'buy' | 'sell'>('buy');
-  const { isActive, account } = useWalletConnection();
+  const { isConnected, address: walletAddress } = useWallet();
   const { toast } = useToast();
 
   // Randomly determine if the property uses ETH or BTC for demo purposes
@@ -63,7 +63,7 @@ const PropertyCard = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!isActive || !account) {
+    if (!isConnected || !walletAddress) {
       toast({
         title: "Wallet Not Connected",
         description: "Please connect your wallet to purchase this property",
@@ -74,7 +74,7 @@ const PropertyCard = ({
     
     // Add transaction to history
     addTransaction({
-      userId: account,
+      userId: walletAddress,
       propertyId: id.toString(),
       propertyName: title,
       propertyImage: propertyImage,

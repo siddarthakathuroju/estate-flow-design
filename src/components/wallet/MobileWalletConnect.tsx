@@ -11,24 +11,24 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { useWalletConnection } from '@/hooks/use-wallet';
+import { useWallet } from '@/hooks/useWallet';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 
 export function MobileWalletConnect() {
   const {
-    account,
-    isActive,
+    address,
+    isConnected,
     balance,
     copied,
     connectMetaMask,
-    connectCoinbaseWallet,
-    disconnect,
+    connectCoinbase,
+    disconnectWallet,
     copyAddress,
     connectionError,
     isConnecting,
     pendingWallet
-  } = useWalletConnection();
+  } = useWallet();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("connect");
   const [manualAddress, setManualAddress] = useState("");
@@ -42,7 +42,7 @@ export function MobileWalletConnect() {
   // Handle connecting to Coinbase Wallet
   const handleCoinbaseConnect = () => {
     setActiveTab("connecting");
-    connectCoinbaseWallet();
+    connectCoinbase();
   };
 
   // Function to open Coinbase Wallet app store page
@@ -55,17 +55,17 @@ export function MobileWalletConnect() {
       <DrawerTrigger asChild>
         <Button variant="outline" className="relative">
           <Wallet className="mr-2" />
-          {isActive ? 'Connected' : 'Connect Wallet'}
-          {isActive && (
+          {isConnected ? 'Connected' : 'Connect Wallet'}
+          {isConnected && (
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></span>
           )}
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>{isActive ? 'Wallet Connected' : 'Connect Wallet'}</DrawerTitle>
+          <DrawerTitle>{isConnected ? 'Wallet Connected' : 'Connect Wallet'}</DrawerTitle>
           <DrawerDescription>
-            {isActive 
+            {isConnected 
               ? 'You are connected to the blockchain' 
               : 'Connect your wallet to access the NFT marketplace'}
           </DrawerDescription>
@@ -78,7 +78,7 @@ export function MobileWalletConnect() {
             </div>
           )}
           
-          {isActive ? (
+          {isConnected ? (
             <div className="space-y-4">
               <div className="flex items-center justify-between bg-secondary/50 p-3 rounded-lg">
                 <div className="flex items-center gap-2">
@@ -86,7 +86,7 @@ export function MobileWalletConnect() {
                   <div className="text-sm">
                     <p className="font-medium">Connected Account</p>
                     <p className="text-muted-foreground break-all">
-                      {account?.substring(0, 6)}...{account?.substring(account.length - 4)}
+                      {address?.substring(0, 6)}...{address?.substring(address.length - 4)}
                     </p>
                   </div>
                 </div>
@@ -116,7 +116,7 @@ export function MobileWalletConnect() {
               <Button 
                 variant="destructive" 
                 className="w-full gap-2" 
-                onClick={disconnect}
+                onClick={disconnectWallet}
               >
                 <LogOut size={16} />
                 Disconnect Wallet

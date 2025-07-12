@@ -17,6 +17,7 @@ import NotFound from './pages/NotFound';
 import KycVerification from './pages/KycVerification';
 import WorkerJobs from './pages/WorkerJobs';
 import JobDetail from './pages/JobDetail';
+import WalletTest from './pages/WalletTest';
 import { Toaster } from './components/ui/toaster';
 import { AuthProvider } from './context/AuthContext';
 import { connectors } from '@/lib/wallet-connectors';
@@ -45,6 +46,7 @@ function App() {
                   <Route path="/kyc" element={<KycVerification />} />
                   <Route path="/jobs/new" element={<WorkerJobs />} />
                   <Route path="/jobs/:id" element={<JobDetail />} />
+                  <Route path="/wallet-test" element={<WalletTest />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
