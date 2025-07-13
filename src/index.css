@@ -220,6 +220,12 @@ html, body {
   overflow-x: hidden;
 }
 
+/* Ensure the root element is visible */
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
+
 /* Improved spacing for mobile */
 @media (max-width: 768px) {
   .section {
