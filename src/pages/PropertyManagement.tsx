@@ -175,7 +175,7 @@ const PropertyManagement = () => {
           
           <Button 
             onClick={() => setShowForm(!showForm)} 
-            className="bg-estate-500 hover:bg-estate-600"
+            className="bg-primary hover:bg-primary/90"
           >
             <Plus className="mr-2 h-4 w-4" />
             {showForm ? 'Cancel' : 'Add New Property'}
@@ -296,7 +296,7 @@ const PropertyManagement = () => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" className="bg-estate-500 hover:bg-estate-600">
+                <Button type="submit" className="bg-primary hover:bg-primary/90">
                   Create Property
                 </Button>
               </div>
